@@ -7,22 +7,20 @@ import { ChakraProvider } from "@chakra-ui/react";
 
 import App from "./App";
 import theme from "./util/theme";
-import { Auth0Provider } from "@auth0/auth0-react";
 import { Provider } from "react-redux";
 import store from "./app/store";
+import { AuthProvider } from "./app/context/AuthContext";
+import { BrowserRouter } from "react-router-dom";
 
 ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
-    <React.StrictMode>
-        <Auth0Provider
-            domain={import.meta.env.VITE_AUTH0_DOMAIN}
-            clientId={import.meta.env.VITE_AUTH0_CLIENT_ID}
-            redirectUri={import.meta.env.VITE_AUTH0_REDIRECT_URI}
-        >
-            <ChakraProvider theme={theme}>
-                <Provider store={store}>
+    // <React.StrictMode>
+    <ChakraProvider theme={theme}>
+        <Provider store={store}>
+            <BrowserRouter>
+                <AuthProvider>
                     <App />
-                </Provider>
-            </ChakraProvider>
-        </Auth0Provider>
-    </React.StrictMode>,
+                </AuthProvider>
+            </BrowserRouter>
+        </Provider>
+    </ChakraProvider>,
 );
