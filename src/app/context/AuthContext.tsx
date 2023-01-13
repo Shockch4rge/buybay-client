@@ -46,7 +46,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     const [_delete] = useDeleteUserMutation();
     const [update] = useUpdateUserMutation();
     const [resetPassword] = useResetPasswordMutation();
-    const { user, token } = useAppSelector(state => state.slices._auth);
+    const { user, token } = useAppSelector(state => state._auth);
 
     useEffect(() => {
         if (!token || !user) {
@@ -54,7 +54,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         }
 
         // navigate(AppRoutes., { replace: true });
-
+        //
         // refreshAuth().unwrap().then(() => {
         // 	navigate(AppRoutes.Board, { replace: true });
         // })

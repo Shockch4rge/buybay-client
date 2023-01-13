@@ -29,7 +29,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const toast = useToast();
-    const cartQuantity = useAppSelector(state => state.cart.items[product.id]?.length ?? 0);
+    const cartQuantity = useAppSelector(state => state.cart.items.length ?? 0);
 
     return <Card
         h={{ base: "5em", md: "8em", lg: "unset" }}

@@ -9,17 +9,13 @@ const uiReducer = combineReducers({
     [modalSlice.name]: modalSlice.reducer,
 });
 
-const sliceReducer = combineReducers({
-    [cartSlice.name]: cartSlice.reducer,
-    [authSlice.name]: authSlice.reducer,
-});
-
 const store = configureStore({
     reducer: {
         [authApi.reducerPath]: authApi.reducer,
         [productsApi.reducerPath]: productsApi.reducer,
+        [cartSlice.name]: cartSlice.reducer,
+        [authSlice.name]: authSlice.reducer,
         ui: uiReducer,
-        slices: sliceReducer,
     },
     middleware: getDM => getDM()
         .concat(authApi.middleware, productsApi.middleware),
