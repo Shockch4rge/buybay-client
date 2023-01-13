@@ -8,7 +8,7 @@ export const ProductReviewSchema = z.object({
     content: z.string(),
     rating: z.number(),
     created_at: z.string(),
-    updated_at: z.string().optional(),
+    updated_at: z.string(),
 }).transform(raw => ({
     id: raw.id,
     productId: raw.product_id,
@@ -17,7 +17,7 @@ export const ProductReviewSchema = z.object({
     content: raw.content,
     rating: raw.rating,
     createdAt: new Date(raw.created_at),
-    updatedAt: raw.updated_at ? new Date(raw.updated_at) : undefined,
+    updatedAt: new Date(raw.updated_at),
 }));
 
 export type ProductReview = z.infer<typeof ProductReviewSchema>;

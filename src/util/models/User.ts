@@ -11,8 +11,8 @@ export const UserSchema = z.object({
     id: raw.id,
     email: raw.email,
     name: raw.name,
-    createdAt: raw.created_at,
-    updatedAt: raw.updated_at,
+    createdAt: new Date(raw.created_at),
+    updatedAt: new Date(raw.updated_at),
 }));
 
 export type User = z.infer<typeof UserSchema>;

@@ -20,7 +20,7 @@ export const ProductSchema = z.object({
     image_urls: z.array(z.string()),
     quantity: z.number(),
     created_at: z.string(),
-    updated_at: z.string().optional(),
+    updated_at: z.string(),
     categories: z.array(ProductCategorySchema),
 }).transform(raw => ({
     id: raw.id,
@@ -32,7 +32,7 @@ export const ProductSchema = z.object({
     imageUrls: raw.image_urls,
     quantity: raw.quantity,
     createdAt: new Date(raw.created_at),
-    updatedAt: raw.updated_at ? new Date(raw.updated_at) : undefined,
+    updatedAt: new Date(raw.updated_at),
     categories: raw.categories,
 }));
 
