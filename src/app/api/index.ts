@@ -4,4 +4,4 @@ export const ResSchema = z.object({
     message: z.string(),
 });
 
-export type Res = z.infer<typeof ResSchema>;
+export type Res<ExtraKeys = object> = ExtraKeys & z.infer<typeof ResSchema>;
