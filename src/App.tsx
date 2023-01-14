@@ -5,8 +5,11 @@ import { CartPage } from "./pages/cart/CartPage";
 import { AppRoutes } from "./util/routes";
 import { ProductPage } from "./pages/product/ProductPage";
 import { useAuth } from "./app/context/AuthContext";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useLazyGetCurrentUserQuery } from "./app/api/auth";
+import { LoginModal } from "./pages/common/LoginModal";
+import { RegisterModal } from "./pages/common/RegisterModal";
+import { ResetPasswordModal } from "./pages/common/ResetPasswordModal";
 
 const App: React.FC = () => {
     const { token } = useAuth();
@@ -18,11 +21,16 @@ const App: React.FC = () => {
         getCurrentUser().unwrap();
     }, []);
 
-    return <Routes>
-        <Route index element={<HomePage/>}/>
-        <Route path={AppRoutes.Cart} element={<CartPage />} />
-        <Route path={AppRoutes.Product(":id")} element={<ProductPage />} />
-    </Routes>;
+    return <>
+        <Routes>
+            <Route index element={<HomePage/>}/>
+            <Route path={AppRoutes.Cart} element={<CartPage />} />
+            <Route path={AppRoutes.Product(":id")} element={<ProductPage />} />
+        </Routes>
+        <LoginModal />
+        <RegisterModal />
+        <ResetPasswordModal />
+    </>;
 };
 
 export default App;
