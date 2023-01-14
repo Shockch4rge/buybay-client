@@ -2,10 +2,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User, UserSchema } from "../../util/models/User";
 import { RootState } from "../store";
 import { z } from "zod";
-
-const ResSchema = z.object({
-    message: z.string(),
-});
+import { ResSchema } from "./index";
 
 const AuthorizedResSchema = ResSchema.extend({
     user: UserSchema,
@@ -34,29 +31,26 @@ const authApi = createApi({
     }),
 
     endpoints: builder => ({
-        getCurrentUser: builder.query<AuthorizedRes, void>({
+        getCurrentUser: builder.query<User, void>({
             query: () => ({
                 url: "/auth/me",
                 method: "GET",
             }),
 
-            transformResponse: async (res: AuthorizedRes) => {
-                return {
-                    ...res,
-                    user: await UserSchema.parseAsync(res),
-                };
-            },
+            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
-        getUser: builder.query<UserRes, User["id"]>({
+        getUser: builder.query<User, User["id"]>({
             query: userId => ({
                 url: `/auth/${userId}`,
                 method: "GET",
             }),
+
+            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
         loginUser: builder.mutation<
-            AuthorizedRes,
+            User,
             Pick<User, "email"> & { password: string }
         >({
             query: ({ email, password }) => ({
@@ -64,6 +58,8 @@ const authApi = createApi({
                 method: "POST",
                 body: { email, password },
             }),
+
+            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
         signOutUser: builder.mutation<void, void>({
@@ -74,7 +70,7 @@ const authApi = createApi({
         }),
 
         registerUser: builder.mutation<
-            AuthorizedRes,
+            User,
             Pick<User, "email" | "name"> & { password: string }
         >({
             query: ({ email, name, password }) => ({
@@ -86,10 +82,12 @@ const authApi = createApi({
                     password,
                 },
             }),
+
+            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
         updateUser: builder.mutation<
-            AuthorizedRes,
+            User,
             Partial<Pick<User, "email" | "name">> & Pick<User, "id">
         >({
             query: ({id, email, name}) => ({
@@ -100,6 +98,8 @@ const authApi = createApi({
                     name,
                 },
             }),
+
+            transformResponse: (res: UserRes) => UserSchema.parseAsync(res.user),
         }),
 
         resetPassword: builder.mutation<void, { oldPassword: string; newPassword: string }>({
