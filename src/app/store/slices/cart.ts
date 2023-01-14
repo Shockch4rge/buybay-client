@@ -1,12 +1,14 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "../../../util/models/Product";
+import { mockProduct1, mockProduct2 } from "../../../util/mocks";
 
 interface CartState {
     items: Product[];
 }
 
 const initialState: CartState = {
-    items: [],
+    items: Array<Product>(10).fill(mockProduct1, 0, 6)
+        .fill(mockProduct2, 6),
 };
 
 interface CartAddPayload {

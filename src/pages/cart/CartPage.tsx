@@ -1,9 +1,9 @@
 import { Button, Container, Heading, HStack, Text, VStack } from "@chakra-ui/react";
 import { ProductCard } from "./components/ProductCard";
 import { FaArrowRight, FaShoppingCart } from "react-icons/fa";
-import { mockProduct1, mockProduct2 } from "../../util/mocks";
 import { Footer } from "../common/Footer";
 import { Product } from "../../util/models/Product";
+import { useAppSelector } from "../../app/store/hooks";
 
 const collapseDuplicates = (products: Product[]) => {
     const map = new Map<string, { product: Product; count: number }>();
@@ -23,8 +23,7 @@ const collapseDuplicates = (products: Product[]) => {
 };
 
 export const CartPage: React.FC = () => {
-    const items = collapseDuplicates(Array<Product>(10).fill(mockProduct1, 0, 6)
-        .fill(mockProduct2, 6));
+    const items = collapseDuplicates(useAppSelector(state => state.cart.items));
 
     return <>
         <Container maxW={{ md: "3xl", lg: "5xl", xl: "6xl" }}>
