@@ -31,8 +31,8 @@ export const ProductSchema = z.object({
     thumbnailUrl: raw.thumbnail_url,
     imageUrls: raw.image_urls,
     quantity: raw.quantity,
-    createdAt: new Date(raw.created_at),
-    updatedAt: new Date(raw.updated_at),
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
     categories: raw.categories,
 }));
 

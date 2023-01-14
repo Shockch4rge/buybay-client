@@ -9,7 +9,7 @@ export const OrderSchema = z.object({
     id: raw.id,
     productId: raw.product_id,
     buyerId: raw.buyer_id,
-    createdAt: new Date(raw.created_at),
+    createdAt: raw.created_at,
 }));
 
 export type Order = z.infer<typeof OrderSchema>;

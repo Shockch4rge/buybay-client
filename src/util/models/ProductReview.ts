@@ -16,8 +16,8 @@ export const ProductReviewSchema = z.object({
     title: raw.title,
     content: raw.content,
     rating: raw.rating,
-    createdAt: new Date(raw.created_at),
-    updatedAt: new Date(raw.updated_at),
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
 }));
 
 export type ProductReview = z.infer<typeof ProductReviewSchema>;

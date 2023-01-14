@@ -28,8 +28,8 @@ export const ReviewCard: React.FC<Props> = ({ review }) => {
             </Text>
         </CardBody>
 
-        <Text pos={"absolute"} bottom={"4"} right={"4"} fontStyle={"italic"}>
-            Added on {review.createdAt.toDateString()}
+        <Text fontSize={"sm"} pos={"absolute"} bottom={"3"} right={"4"}>
+            Added on {new Date(review.createdAt).toLocaleDateString()}
         </Text>
     </Card>;
 };
