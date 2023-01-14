@@ -15,7 +15,7 @@ import {
     VStack,
 } from "@chakra-ui/react";
 import { Product } from "../../../util/models/Product";
-import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
+import { useAppDispatch } from "../../../app/store/hooks";
 import { FaMinus, FaPlus } from "react-icons/fa";
 import { cartAdd, cartRemove } from "../../../app/store/slices/cart";
 import { useNavigate } from "react-router-dom";
@@ -23,13 +23,13 @@ import { AppRoutes } from "../../../util/routes";
 
 interface Props {
     product: Product;
+    cartQuantity: number;
 }
 
-export const ProductCard: React.FC<Props> = ({ product }) => {
+export const ProductCard: React.FC<Props> = ({ product, cartQuantity }) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const toast = useToast();
-    const cartQuantity = useAppSelector(state => state.cart.items.length ?? 0);
 
     return <Card
         h={{ base: "5em", md: "8em", lg: "unset" }}
@@ -43,7 +43,7 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
         }}
         transition={"border 0.2s ease-out"}
     >
-        <Image fit={"cover"} src={product.thumbnailUrl} />
+        <Image fit={"cover"} boxSize={"xs"} src={product.thumbnailUrl} />
         <CardBody px={"8"} display={"flex"} gap={"8"} justifyContent={"space-between"} alignItems={"center"}>
             <Stack mt={"2"} spacing={"3"}>
                 <HStack align={"center"} spacing={"2"}>

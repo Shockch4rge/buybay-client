@@ -2,11 +2,11 @@ import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 import { Product } from "../../../util/models/Product";
 
 interface CartState {
-    items: Record<string, Product[]>;
+    items: Product[];
 }
 
 const initialState: CartState = {
-    items: {},
+    items: [],
 };
 
 interface CartAddPayload {
@@ -24,11 +24,12 @@ export const cartSlice = createSlice({
     initialState,
     reducers: {
         cartAdd: (state, action: PayloadAction<Product>) => {
-            state.items[action.payload.id].push(action.payload);
+            state.items.push(action.payload);
         },
 
         cartRemove: (state, action: PayloadAction<Product>) => {
-            state.items[action.payload.id].pop();
+            const index = state.items.findIndex(i => i.id === action.payload.id);
+            state.items.splice(index, 1);
         },
     },
 });
