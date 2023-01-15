@@ -1,5 +1,5 @@
 import { Field, Form, Formik } from "formik";
-import { useCallback, useState } from "react";
+import { useState } from "react";
 import { FaEye, FaEyeSlash } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import * as Yup from "yup";
@@ -26,9 +26,9 @@ import {
     Tooltip,
     VStack,
 } from "@chakra-ui/react";
-import { useAuth } from "../../../app/context/AuthContext";
-import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
-import { closeModal, openModal } from "../../../app/store/slices/ui/modals";
+import { useAuth } from "../../app/context/AuthContext";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { closeModal, openModal } from "../../app/store/slices/ui/modals";
 
 const loginModalName = "login";
 const emailFieldName = "email";
@@ -41,14 +41,14 @@ export const LoginModal: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const { open } = useAppSelector(state => state.ui.modals.login);
 
-    const close = useCallback(() => dispatch(closeModal(loginModalName)), []);
+    const close = () => dispatch(closeModal(loginModalName));
 
     return (
         <Modal size={["xs", "md", "lg", "xl"]} isCentered isOpen={open} onClose={close}>
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    <Heading>buybay</Heading>
+                    <Heading textAlign={"center"}>buybay</Heading>
                 </ModalHeader>
                 <ModalCloseButton />
                 <Formik
@@ -160,8 +160,8 @@ export const LoginModal: React.FC = () => {
                                     type="submit"
                                     variant="primary"
                                     disabled={
-                                        !isValid ||
                                         isSubmitting ||
+                                        !isValid ||
                                         !touched.email ||
                                         !touched.password
                                     }

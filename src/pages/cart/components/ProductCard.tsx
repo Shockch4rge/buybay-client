@@ -43,7 +43,7 @@ export const ProductCard: React.FC<Props> = ({ product, cartQuantity }) => {
         }}
         transition={"border 0.2s ease-out"}
     >
-        <Image fit={"cover"} boxSize={"xs"} src={product.thumbnailUrl} />
+        <Image fit={"cover"} boxSize={"xs"} src={product.images.find(i => i.isThumbnail)!.url} />
         <CardBody px={"8"} display={"flex"} gap={"8"} justifyContent={"space-between"} alignItems={"center"}>
             <Stack mt={"2"} spacing={"3"}>
                 <HStack align={"center"} spacing={"2"}>
@@ -64,9 +64,7 @@ export const ProductCard: React.FC<Props> = ({ product, cartQuantity }) => {
                         aria-label={"Decrease Quantity"}
                         icon={<FaMinus/>}
                         disabled={cartQuantity <= 1}
-                        onClick={() => {
-                            dispatch(cartRemove(product));
-                        }}
+                        onClick={() => dispatch(cartRemove(product))}
                     />
                     <Heading size={"md"}>{cartQuantity}</Heading>
                     <IconButton
@@ -74,9 +72,7 @@ export const ProductCard: React.FC<Props> = ({ product, cartQuantity }) => {
                         aria-label={"Increase Quantity"}
                         icon={<FaPlus/>}
                         disabled={cartQuantity >= product.quantity}
-                        onClick={() => {
-                            dispatch(cartAdd(product));
-                        }}
+                        onClick={() => dispatch(cartAdd(product))}
                     />
                     <Text fontSize={"lg"}>${(product.price * cartQuantity).toFixed(2)}</Text>
                 </HStack>

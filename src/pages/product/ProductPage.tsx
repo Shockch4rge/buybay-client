@@ -15,7 +15,7 @@ import {
     Wrap,
     WrapItem,
 } from "@chakra-ui/react";
-import { mockProduct, mockReview } from "../../util/mocks";
+import { mockReview } from "../../util/mocks";
 import { ProductImageGrid } from "./components/ProductImageGrid";
 import { FaMinus, FaPlus, FaShoppingCart, FaStar } from "react-icons/fa";
 import { useState } from "react";
@@ -23,14 +23,18 @@ import { ReviewCard } from "./components/ReviewCard";
 import { NavBar } from "../common/NavBar";
 import { useDispatch } from "react-redux";
 import { cartAdd } from "../../app/store/slices/cart";
+import { useGetProductQuery } from "../../app/api/products";
 
 export const ProductPage: React.FC = () => {
     // const { id } = useParams();
-    const product = mockProduct;
+    const { data: product } = useGetProductQuery();
     const reviews = Array(5).fill(mockReview);
     const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
     const toast = useToast();
     const dispatch = useDispatch();
+
+    if (!product) return <></>;
+
     const [cartQuantity, setCartQuantity] = useState(product.quantity === 0 ? 0 : 1);
 
     return <>
@@ -39,7 +43,7 @@ export const ProductPage: React.FC = () => {
             <Box>
                 <Heading>Product Information</Heading>
                 <Flex mt={"8"} p={"4"} direction={{ base: "column-reverse", lg: "row" }} gap={"8"} borderWidth={"thin"} borderRadius={"lg"}>
-                    <ProductImageGrid urls={product.imageUrls} />
+                    <ProductImageGrid urls={product.images.map(i => i.url)} />
                     <Box flex={"1"} pos={"relative"}>
                         <Heading>
                             {product.name}
@@ -56,7 +60,7 @@ export const ProductPage: React.FC = () => {
                                 <WrapItem key={`product-${product.id}-tag-${i}`}>
                                     <Link>
                                         <Tag _hover={{ bg: "gray.200" }}>
-                                            <TagLabel>{c}</TagLabel>
+                                            <TagLabel>{c.name}</TagLabel>
                                         </Tag>
                                     </Link>
                                 </WrapItem>,
@@ -74,7 +78,7 @@ export const ProductPage: React.FC = () => {
                             ? <Text>{product.quantity} left in stock</Text>
                             : <Text color={"red.500"}>Out of stock</Text>
                         }
-                        <Text mt={"12"} fontStyle={"italic"}>
+                        <Text mt={"12"}>
                             Added on {new Date(product.createdAt).toLocaleDateString()}
                         </Text>
 
