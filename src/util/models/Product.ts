@@ -10,17 +10,26 @@ export const ProductCategorySchema = z.object({
     name: raw.name,
 }));
 
+export const ProductImageSchema = z.object({
+    product_id: z.string(),
+    url: z.string(),
+    is_thumbnail: z.boolean(),
+}).transform(raw => ({
+    productId: raw.product_id,
+    url: raw.url,
+    isThumbnail: raw.is_thumbnail,
+}));
+
 export const ProductSchema = z.object({
     id: z.string(),
     seller_id: z.string(),
     name: z.string(),
     description: z.string(),
     price: z.number(),
-    thumbnail_url: z.string(),
-    image_urls: z.array(z.string()),
     quantity: z.number(),
     created_at: z.string(),
     updated_at: z.string(),
+    images: z.array(ProductImageSchema),
     categories: z.array(ProductCategorySchema),
 }).transform(raw => ({
     id: raw.id,
@@ -28,8 +37,7 @@ export const ProductSchema = z.object({
     name: raw.name,
     description: raw.description,
     price: raw.price,
-    thumbnailUrl: raw.thumbnail_url,
-    imageUrls: raw.image_urls,
+    images: raw.images,
     quantity: raw.quantity,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
