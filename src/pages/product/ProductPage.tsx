@@ -24,18 +24,18 @@ import { NavBar } from "../common/NavBar";
 import { useDispatch } from "react-redux";
 import { cartAdd } from "../../app/store/slices/cart";
 import { useGetProductQuery } from "../../app/api/products";
+import { useParams } from "react-router-dom";
 
 export const ProductPage: React.FC = () => {
-    // const { id } = useParams();
-    const { data: product } = useGetProductQuery();
+    const { id } = useParams();
+    const [cartQuantity, setCartQuantity] = useState(1);
+    const { data: product } = useGetProductQuery(id!);
     const reviews = Array(5).fill(mockReview);
     const averageRating = reviews.reduce((acc, review) => acc + review.rating, 0) / reviews.length;
     const toast = useToast();
     const dispatch = useDispatch();
 
     if (!product) return <></>;
-
-    const [cartQuantity, setCartQuantity] = useState(product.quantity === 0 ? 0 : 1);
 
     return <>
         <NavBar />

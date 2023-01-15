@@ -2,23 +2,13 @@ import { Box } from "@chakra-ui/react";
 import { AsyncSelect, chakraComponents, OptionBase } from "chakra-react-select";
 import { useLazySearchQuery } from "../../../app/api/products";
 import { useCallback } from "react";
+import { useNavigate } from "react-router-dom";
+import { AppRoutes } from "../../../util/routes";
 
-interface ColorOption extends OptionBase {
+interface ResultOption extends OptionBase {
     label: string;
     value: string;
 }
-
-const colorOptions = [
-    {
-        label: "Red",
-        value: "red",
-        colorScheme: "red",
-    },
-    {
-        label: "Blue",
-        value: "blue",
-    },
-];
 
 const asyncComponents = {
     LoadingIndicator: (props: any) =>
@@ -43,6 +33,7 @@ const debounce = (fn: (...args: any[]) => any, delay : number) => {
 };
 
 export const SearchBar: React.FC = () => {
+    const navigate = useNavigate();
     const [search] = useLazySearchQuery();
 
     const debouncedSearch = useCallback(
@@ -57,12 +48,17 @@ export const SearchBar: React.FC = () => {
     );
 
     return <Box my={"24"}>
-        <AsyncSelect
-            options={colorOptions}
+        <AsyncSelect<ResultOption>
             components={asyncComponents}
             placeholder={"Search for something..."}
             loadOptions={debouncedSearch}
+            onChange={(newValue, { action }) => {
+                if (!newValue) return;
 
+                if (action === "select-option") {
+                    navigate(AppRoutes.Product(newValue.value));
+                }
+            }}
         />
     </Box>;
 };
