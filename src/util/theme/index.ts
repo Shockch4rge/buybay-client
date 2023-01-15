@@ -1,6 +1,4 @@
-import {
-    ComponentStyleConfig, extendTheme, ThemeConfig
-} from "@chakra-ui/react";
+import { ComponentStyleConfig, extendTheme, ThemeConfig } from "@chakra-ui/react";
 import { StyleFunctionProps } from "@chakra-ui/theme-tools";
 
 const config: ThemeConfig = {
@@ -26,7 +24,7 @@ const extendedTheme = {
                         textColor: "white",
                     },
                     _active: {
-                        bg: "green.400",
+                        bg: "green.300",
                         // textColor: "green.700",
                     },
                 }),
