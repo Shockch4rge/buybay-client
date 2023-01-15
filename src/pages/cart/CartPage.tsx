@@ -19,11 +19,12 @@ const collapseDuplicates = (products: Product[]) => {
         map.set(p.id, { product: p, count: 1 });
     }
 
+    // sorts a pair of (or more) products randomly if they have the same count
     return Array.from(map.values());
 };
 
 export const CartPage: React.FC = () => {
-    const items = collapseDuplicates(useAppSelector(state => state.cart.items));
+    const items = useAppSelector(state => state.cart.items);
 
     return <>
         <Container maxW={{ md: "3xl", lg: "5xl", xl: "6xl" }}>
@@ -32,12 +33,14 @@ export const CartPage: React.FC = () => {
                     <FaShoppingCart size={"1.8em"} />
                     <Heading>Cart</Heading>
                 </HStack>
-                <Text fontSize={"1.4em"}>4 items &bull; ${123.50.toFixed(2)}</Text>
+                <Text fontSize={"1.4em"}>
+                    {items.length} items &bull; ${items.reduce((a, b) => a + b.price, 0).toFixed(2)}
+                </Text>
             </VStack>
             <VStack spacing={"4"} align={"stretch"}>
                 {items.length === 0
                     ? <Text>Your cart is empty.</Text>
-                    : items.map((item, i) =>
+                    : collapseDuplicates(items).map((item, i) =>
                         <ProductCard key={`cart-product-${i}`} product={item.product} cartQuantity={item.count} />,
                     )
                 }
