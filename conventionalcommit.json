@@ -1,0 +1,7 @@
+{
+  "types": {
+    "deps": {
+      "description": "Track updates to your project's dependencies"
+    }
+  }
+}
