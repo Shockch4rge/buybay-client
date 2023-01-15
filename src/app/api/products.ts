@@ -1,10 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
 import { Res } from "./index";
-import { Product, ProductSchema } from "../../util/models/Product";
+import { Product, ProductCategory, ProductCategorySchema, ProductSchema } from "../../util/models/Product";
 
 const productsApi = createApi({
     reducerPath: "products",
+
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_PRODUCTS_API,
         prepareHeaders: (headers, { getState }) => {
@@ -17,6 +18,7 @@ const productsApi = createApi({
             return headers;
         },
     }),
+
     endpoints: builder => ({
         getProducts: builder.query<Product[], void>({
             query: () => ({
@@ -62,11 +64,33 @@ const productsApi = createApi({
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
         }),
+
+        getAllCategories: builder.query<ProductCategory[], void>({
+            query: () => ({
+                url: "/categories",
+                method: "GET",
+            }),
+
+            transformResponse: (res: Res<{ categories: ProductCategory[] }>) =>
+                Promise.all(res.categories.map(c => ProductCategorySchema.parseAsync(c))),
+        }),
+
+        search: builder.query<Product[], { query: string }>({
+            query: ({ query }) => ({
+                url: `/search/${query}`,
+                method: "GET",
+            }),
+
+            transformResponse: (res: Res<{ products: Product[] }>) =>
+                Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+        }),
     }),
 });
 
 export const {
     useGetProductQuery,
+    useGetAllCategoriesQuery,
+    useLazySearchQuery,
 } = productsApi;
 
 export default productsApi;
