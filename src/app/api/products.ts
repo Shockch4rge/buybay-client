@@ -29,7 +29,7 @@ const productsApi = createApi({
             transformResponse: (res: Res<{ products: Product[] }>) => Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
         }),
 
-        getProduct: builder.query<Product, void>({
+        getProduct: builder.query<Product, Product["id"]>({
             query: id => ({
                 url: `/products/${id}`,
                 method: "GET",
@@ -77,7 +77,7 @@ const productsApi = createApi({
 
         search: builder.query<Product[], { query: string }>({
             query: ({ query }) => ({
-                url: `/search/${query}`,
+                url: `/products/search/${query}`,
                 method: "GET",
             }),
 
