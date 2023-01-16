@@ -11,16 +11,6 @@ const initialState: CartState = {
         .fill(mockProduct2, 6),
 };
 
-interface CartAddPayload {
-    product: Product;
-    quantity: number;
-}
-
-interface CartRemovePayload {
-    product: Product;
-    quantity: number;
-}
-
 export const cartSlice = createSlice({
     name: "cart",
     initialState,
