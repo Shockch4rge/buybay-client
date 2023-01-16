@@ -1,9 +1,10 @@
 import { Box } from "@chakra-ui/react";
-import { AsyncSelect, chakraComponents } from "chakra-react-select";
+import { AsyncSelect, chakraComponents, FormatOptionLabelMeta } from "chakra-react-select";
 import { useLazyGetProductsByCategoryQuery, useLazySearchQuery } from "../../../app/api/products";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../../util/routes";
+import Highlighter from "react-highlight-words";
 
 type SelectOption = {
     label: string;
@@ -11,6 +12,8 @@ type SelectOption = {
     // group label is inaccessible by default; we save it here
     group: "Categories" | "Products";
 };
+
+const loadingMessages = ["Baking a pizza...", "Wrapping a gift...", "Boiling water...", "Crying inside..."];
 
 type SelectConfig = {
     label: SelectOption["group"];
@@ -38,6 +41,16 @@ const debounce = (fn: (...args: any[]) => any, delay : number) => {
         timeout = setTimeout(() => fn(...args), delay);
     };
 };
+
+function formatOptionLabel({ label }: SelectConfig, { inputValue }: FormatOptionLabelMeta<SelectConfig>) {
+    return (
+        <Highlighter
+            searchWords={[inputValue]}
+            textToHighlight={label}
+            highlightStyle={{ backgroundColor: "#9ae6b4", padding: 0 }}
+        />
+    );
+}
 
 export const SearchBar: React.FC = () => {
     const navigate = useNavigate();
@@ -75,6 +88,11 @@ export const SearchBar: React.FC = () => {
             components={asyncComponents}
             placeholder={"Search for something..."}
             loadOptions={debouncedSearch}
+            colorScheme={"green"}
+            size={"lg"}
+            formatOptionLabel={formatOptionLabel}
+            noOptionsMessage={() => "No results found"}
+            loadingMessage={() => loadingMessages[Math.floor(Math.random() * loadingMessages.length)]}
             onChange={(newValue, meta) => {
                 if (!newValue || meta.action !== "select-option") return;
 
