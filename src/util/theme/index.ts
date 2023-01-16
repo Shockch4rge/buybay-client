@@ -94,8 +94,8 @@ const extendedTheme = {
         },
     } as ComponentStyleConfig,
     fonts: {
-        body: "Rubik",
-        heading: "Rubik",
+        body: "Inter",
+        heading: "Inter",
         monospace: "Menlo, monospace",
     },
 };

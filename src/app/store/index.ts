@@ -1,9 +1,10 @@
 import { combineReducers, configureStore } from "@reduxjs/toolkit";
 import cartSlice from "./slices/cart";
 import authApi from "../api/auth";
-import productsApi from "../api/products";
+import productApi from "../api/products";
 import authSlice from "./slices/auth";
 import modalSlice from "./slices/ui/modals";
+import productReviewApi from "../api/productReviews";
 
 const uiReducer = combineReducers({
     [modalSlice.name]: modalSlice.reducer,
@@ -12,13 +13,14 @@ const uiReducer = combineReducers({
 const store = configureStore({
     reducer: {
         [authApi.reducerPath]: authApi.reducer,
-        [productsApi.reducerPath]: productsApi.reducer,
+        [productApi.reducerPath]: productApi.reducer,
+        [productReviewApi.reducerPath]: productReviewApi.reducer,
         [cartSlice.name]: cartSlice.reducer,
         [authSlice.name]: authSlice.reducer,
         ui: uiReducer,
     },
     middleware: getDM => getDM()
-        .concat(authApi.middleware, productsApi.middleware),
+        .concat(authApi.middleware, productApi.middleware),
 });
 
 export type Store = typeof store;
