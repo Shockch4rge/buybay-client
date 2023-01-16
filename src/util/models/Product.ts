@@ -2,11 +2,9 @@ import { z } from "zod";
 
 export const ProductCategorySchema = z.object({
     id: z.string(),
-    product_id: z.string(),
     name: z.string(),
 }).transform(raw => ({
     id: raw.id,
-    productId: raw.product_id,
     name: raw.name,
 }));
 
