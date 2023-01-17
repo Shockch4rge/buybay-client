@@ -10,8 +10,7 @@ export const ReviewCard: React.FC<Props> = ({ review }) => {
     return <Card variant={"outline"} borderRadius={"lg"} w="full" pos={"relative"}>
         <CardHeader>
             <HStack spacing={"6"} align={"center"}>
-                <Avatar/>
-                <Heading size={"md"}>{review.title}</Heading>
+                <Avatar />
                 <HStack>
                     {Array.from({ length: 5 }, (_, i) => i + 1).map((_, i) =>
                         <Text key={i} color={i < review.rating ? "green.300" : "gray.400"}>
@@ -19,12 +18,13 @@ export const ReviewCard: React.FC<Props> = ({ review }) => {
                         </Text>,
                     )}
                 </HStack>
+                <Heading size={"md"}>{review.title}</Heading>
             </HStack>
         </CardHeader>
 
         <CardBody>
             <Text>
-                {review.content}
+                {review.description}
             </Text>
         </CardBody>
 
