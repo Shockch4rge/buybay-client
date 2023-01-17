@@ -2,9 +2,16 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
 import { Res } from "./index";
 import { Product, ProductCategory, ProductCategorySchema, ProductSchema } from "../../util/models/Product";
+import cacheUtils from "../../util/cacheUtils";
+
+const Tag = {
+    Products: "Product",
+    Categories: "ProductCategory",
+};
 
 const productsApi = createApi({
     reducerPath: "products",
+    tagTypes: [...cacheUtils.defaultTags, Tag.Products, Tag.Categories],
 
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_PRODUCTS_API,
@@ -27,6 +34,8 @@ const productsApi = createApi({
             }),
 
             transformResponse: (res: Res<{ products: Product[] }>) => Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+
+            providesTags: cacheUtils.providesList(Tag.Products),
         }),
 
         getProduct: builder.query<Product, Product["id"]>({
@@ -36,9 +45,11 @@ const productsApi = createApi({
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
+
+            providesTags: cacheUtils.cacheByIdArg(Tag.Products),
         }),
         
-        addProduct: builder.query<Product, Omit<Product, "createdAt" | "id" | "updatedAt">>({
+        addProduct: builder.mutation<Product, Omit<Product, "createdAt" | "id" | "updatedAt">>({
             query: product => ({
                 url: "/products",
                 method: "POST",
@@ -46,16 +57,20 @@ const productsApi = createApi({
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
-        deleteProduct: builder.query<void, Product["id"]>({
+        deleteProduct: builder.mutation<void, Product["id"]>({
             query: id => ({
                 url: `/products/${id}`,
                 method: "DELETE",
             }),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
-        updateProduct: builder.query<Product, Partial<Omit<Product, "createdAt" | "updatedAt">>>({
+        updateProduct: builder.mutation<Product, Partial<Omit<Product, "createdAt" | "updatedAt">>>({
             query: product => ({
                 url: `/products/${product.id}`,
                 method: "PUT",
@@ -63,6 +78,8 @@ const productsApi = createApi({
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
         getAllCategories: builder.query<ProductCategory[], void>({
@@ -73,16 +90,35 @@ const productsApi = createApi({
 
             transformResponse: (res: Res<{ categories: ProductCategory[] }>) =>
                 Promise.all(res.categories.map(c => ProductCategorySchema.parseAsync(c))),
+
+            providesTags: cacheUtils.providesList(Tag.Categories),
         }),
 
-        search: builder.query<Product[], { query: string }>({
+        search: builder.query<{ products: Product[]; categories: ProductCategory[] }, { query: string }>({
             query: ({ query }) => ({
                 url: `/products/search/${query}`,
                 method: "GET",
             }),
 
-            transformResponse: (res: Res<{ products: Product[] }>) =>
-                Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+            transformResponse: async (res: Res<{ products: Product[]; categories: ProductCategory[] }>) => {
+                const { products, categories } = res;
+
+                return {
+                    products: await Promise.all(products.map(p => ProductSchema.parseAsync(p))),
+                    categories: await Promise.all(categories.map(c => ProductCategorySchema.parseAsync(c))),
+                };
+            },
+        }),
+
+        getProductsByCategory: builder.query<Product[], ProductCategory["id"]>({
+            query: categoryId => ({
+                url: `/categories/${categoryId}/products`,
+                method: "GET",
+            }),
+    
+            transformResponse: (res: Res<{ products: Product[] }>) => Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+
+            providesTags: cacheUtils.providesList(Tag.Products),
         }),
     }),
 });
@@ -91,6 +127,7 @@ export const {
     useGetProductQuery,
     useGetAllCategoriesQuery,
     useLazySearchQuery,
+    useLazyGetProductsByCategoryQuery,
 } = productsApi;
 
 export default productsApi;
