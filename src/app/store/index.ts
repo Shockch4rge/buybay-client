@@ -20,7 +20,7 @@ const store = configureStore({
         ui: uiReducer,
     },
     middleware: getDM => getDM()
-        .concat(authApi.middleware, productApi.middleware),
+        .concat(authApi.middleware, productApi.middleware, productReviewApi.middleware),
 });
 
 export type Store = typeof store;
