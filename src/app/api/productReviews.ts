@@ -1,11 +1,11 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { RootState } from "../store";
-import { ProductReview, ProductReviewSchema } from "../../util/models/ProductReview";
+import { ProductReview, ProductReviewJSON, ProductReviewSchema } from "../../util/models/ProductReview";
 import { Res } from "./index";
 import cacheUtils from "../../util/cacheUtils";
 
 const Tags = {
-    ProductReviews: "productReviews",
+    ProductReviews: "ProductReviews",
 };
 
 const productReviewApi = createApi({
@@ -29,7 +29,7 @@ const productReviewApi = createApi({
     endpoints: builder => ({
         getProductReviews: builder.query<ProductReview[], ProductReview["productId"]>({
             query: productId => ({
-                url: `/product-reviews/${productId}`,
+                url: `/product/${productId}/reviews`,
                 method: "GET",
             }),
 
@@ -39,7 +39,7 @@ const productReviewApi = createApi({
             providesTags: cacheUtils.providesList(Tags.ProductReviews),
         }),
 
-        addProductReview: builder.mutation<ProductReview, Omit<ProductReview, "createdAt" | "id" | "updatedAt">>({
+        addProductReview: builder.mutation<ProductReview, Omit<ProductReviewJSON, "created_at" | "id" | "updated_at">>({
             query: review => ({
                 url: "/product-reviews",
                 method: "POST",
@@ -51,12 +51,22 @@ const productReviewApi = createApi({
 
             invalidatesTags: cacheUtils.invalidatesList(Tags.ProductReviews),
         }),
+
+        deleteProductReview: builder.mutation<void, ProductReview["id"]>({
+            query: id => ({
+                url: `/product-reviews/${id}`,
+                method: "DELETE",
+            }),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tags.ProductReviews),
+        }),
     }),
 });
 
 export const {
     useGetProductReviewsQuery,
     useAddProductReviewMutation,
+    useDeleteProductReviewMutation,
 } = productReviewApi;
 
 export default productReviewApi;
