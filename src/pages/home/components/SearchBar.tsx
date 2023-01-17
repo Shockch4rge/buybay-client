@@ -86,7 +86,7 @@ export const SearchBar: React.FC = () => {
     return <Box my={"24"}>
         <AsyncSelect<SelectConfig>
             components={asyncComponents}
-            placeholder={"Search for something..."}
+            placeholder={"Search for products or categories..."}
             loadOptions={debouncedSearch}
             colorScheme={"green"}
             size={"lg"}
