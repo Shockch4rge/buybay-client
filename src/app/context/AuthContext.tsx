@@ -8,9 +8,9 @@ import { UseMutation } from "@reduxjs/toolkit/dist/query/react/buildHooks";
 import {
     useDeleteUserMutation,
     useLoginUserMutation,
+    useLogoutUserMutation,
     useRegisterUserMutation,
     useResetPasswordMutation,
-    useSignOutUserMutation,
     useUpdateUserMutation,
 } from "../api/auth";
 import { User } from "../../util/models/User";
@@ -22,7 +22,7 @@ type AuthContextState = {
     token: string | null;
     loginUser: (params: MutationParams<typeof useLoginUserMutation>) => Promise<void>;
     deleteUser: (params: MutationParams<typeof useDeleteUserMutation>) => Promise<void>;
-    logoutUser: (params: MutationParams<typeof useSignOutUserMutation>) => Promise<void>;
+    logoutUser: (params: MutationParams<typeof useLogoutUserMutation>) => Promise<void>;
     updateUser: (params: MutationParams<typeof useUpdateUserMutation>) => Promise<void>;
     registerUser: (params: MutationParams<typeof useRegisterUserMutation>) => Promise<void>;
     resetUserPassword: (params: MutationParams<typeof useResetPasswordMutation>) => Promise<void>;
@@ -41,7 +41,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     const toast = useToast();
     const navigate = useNavigate();
     const [login] = useLoginUserMutation();
-    const [logout] = useSignOutUserMutation();
+    const [logout] = useLogoutUserMutation();
     const [register] = useRegisterUserMutation();
     const [_delete] = useDeleteUserMutation();
     const [update] = useUpdateUserMutation();
@@ -60,24 +60,25 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         // })
     }, [token, user]);
 
-    const loginUser = async (params: MutationParams<typeof useLoginUserMutation>) => {
-        try {
-            await login(params).unwrap();
-            toast({
-                status: "success",
-                description: "Login successful!",
-            });
-        }
-        catch (e) {
-            toast({
-                status: "error",
-                description: (e as any).data.status.message,
-            });
-        }
-    };
+    const loginUser = useCallback(
+        async (params: MutationParams<typeof useLoginUserMutation>) => {
+            try {
+                await login(params).unwrap();
+                toast({
+                    status: "success",
+                    description: "Login successful!",
+                });
+            }
+            catch (e) {
+                toast({
+                    status: "error",
+                    description: (e as any).data.status.message,
+                });
+            }
+        }, []);
 
     const logoutUser = useCallback(
-        async (params: MutationParams<typeof useSignOutUserMutation>) => {
+        async (params: MutationParams<typeof useLogoutUserMutation>) => {
             try {
                 await logout(params).unwrap();
                 toast({
@@ -96,56 +97,59 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         [],
     );
 
-    const registerUser = async (params: MutationParams<typeof useRegisterUserMutation>) => {
-        try {
-            const result = await register(params).unwrap();
-            toast({
-                status: "success",
-                description: "Created your account!",
-            });
-        }
-        catch (e) {
-            console.warn("Could not create user", e);
-            toast({
-                status: "error",
-                description: "There was a problem registering your account. Please try again.",
-            });
-        }
-    };
+    const registerUser = useCallback(
+        async (params: MutationParams<typeof useRegisterUserMutation>) => {
+            try {
+                const result = await register(params).unwrap();
+                toast({
+                    status: "success",
+                    description: "Created your account!",
+                });
+            }
+            catch (e) {
+                console.warn("Could not create user", e);
+                toast({
+                    status: "error",
+                    description: "There was a problem registering your account. Please try again.",
+                });
+            }
+        }, []);
 
-    const deleteUser = async (params: MutationParams<typeof useDeleteUserMutation>) => {
-        try {
-            await _delete(params).unwrap();
-            toast({
-                status: "success",
-                description: "Account deleted.",
-            });
-        }
-        catch (e) {
-            console.warn("Could not delete user", e);
-            toast({
-                status: "error",
-                description: "There was a problem deleting your account. Please try again.",
-            });
-        }
-    };
+    const deleteUser = useCallback(
+        async (params: MutationParams<typeof useDeleteUserMutation>) => {
+            try {
+                await _delete(params).unwrap();
+                toast({
+                    status: "success",
+                    description: "Account deleted.",
+                });
+            }
+            catch (e) {
+                console.warn("Could not delete user", e);
+                toast({
+                    status: "error",
+                    description: "There was a problem deleting your account. Please try again.",
+                });
+            }
+        }, []);
 
-    const updateUser = async (params: MutationParams<typeof useUpdateUserMutation>) => {
-        try {
-            await update(params).unwrap();
-            toast({
-                status: "success",
-                description: "Updated account details!",
-            });
-        }
-        catch (e) {
-            console.warn("Could not update user", e);
-            toast({
-                status: "error",
-                description: "There was a problem updating your account. Please try again.",
-            });
-        }
-    };
+    const updateUser = useCallback(
+        async (params: MutationParams<typeof useUpdateUserMutation>) => {
+            try {
+                await update(params).unwrap();
+                toast({
+                    status: "success",
+                    description: "Updated account details!",
+                });
+            }
+            catch (e) {
+                console.warn("Could not update user", e);
+                toast({
+                    status: "error",
+                    description: "There was a problem updating your account. Please try again.",
+                });
+            }
+        }, []);
 
     const resetUserPassword = useCallback(
         async (params: MutationParams<typeof useResetPasswordMutation>) => {

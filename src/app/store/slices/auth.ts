@@ -35,7 +35,7 @@ const authSlice = createSlice({
                     state.user = payload.user;
                 },
             )
-            .addMatcher(authService.endpoints.signOutUser.matchFulfilled, state => {
+            .addMatcher(authService.endpoints.logoutUser.matchFulfilled, state => {
                 localStorage.removeItem("token");
                 state.token = null;
                 state.user = null;

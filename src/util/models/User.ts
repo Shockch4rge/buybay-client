@@ -5,6 +5,7 @@ export const UserSchema = z.object({
     email: z.string()
         .email(),
     name: z.string(),
+    avatar_url: z.string().optional(),
     created_at: z.string(),
     updated_at: z.string(),
 }).transform(raw => ({
@@ -13,6 +14,10 @@ export const UserSchema = z.object({
     name: raw.name,
     createdAt: raw.created_at,
     updatedAt: raw.updated_at,
+    avatarUrl: raw.avatar_url,
 }));
 
 export type User = z.infer<typeof UserSchema>;
+
+const jsonType = UserSchema.innerType();
+export type UserJSON = z.infer<typeof jsonType>;

@@ -2,21 +2,25 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User, UserSchema } from "../../util/models/User";
 import { RootState } from "../store";
 import { z } from "zod";
-import { ResSchema } from "./index";
 
-const AuthorizedResSchema = ResSchema.extend({
+const AuthorizedResSchema = z.object({
     user: UserSchema,
+    message: z.string(),
     token: z.string(),
 });
 
 type AuthorizedRes = z.infer<typeof AuthorizedResSchema>;
 
-const UserResSchema = AuthorizedResSchema.omit({ token: true });
+const UserResSchema = z.object({
+    user: UserSchema,
+    message: z.string(),
+});
 
 type UserRes = z.infer<typeof UserResSchema>;
 
 const authApi = createApi({
     reducerPath: "auth",
+
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_USERS_API,
         prepareHeaders: (headers, { getState }) => {
@@ -31,26 +35,26 @@ const authApi = createApi({
     }),
 
     endpoints: builder => ({
-        getCurrentUser: builder.query<User, void>({
+        getCurrentUser: builder.query<UserRes, void>({
             query: () => ({
                 url: "/auth/me",
                 method: "GET",
             }),
 
-            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+            transformResponse: (res: UserRes) => UserResSchema.parseAsync(res),
         }),
 
-        getUser: builder.query<User, User["id"]>({
+        getUser: builder.query<AuthorizedRes, User["id"]>({
             query: userId => ({
                 url: `/auth/${userId}`,
                 method: "GET",
             }),
 
-            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+            transformResponse: async (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
         }),
 
         loginUser: builder.mutation<
-            User,
+            AuthorizedRes,
             Pick<User, "email"> & { password: string }
         >({
             query: ({ email, password }) => ({
@@ -59,10 +63,10 @@ const authApi = createApi({
                 body: { email, password },
             }),
 
-            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+            transformResponse: (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
         }),
 
-        signOutUser: builder.mutation<void, void>({
+        logoutUser: builder.mutation<void, void>({
             query: () => ({
                 url: "/auth/logout",
                 method: "POST",
@@ -70,20 +74,16 @@ const authApi = createApi({
         }),
 
         registerUser: builder.mutation<
-            User,
-            Pick<User, "email" | "name"> & { password: string }
+            AuthorizedRes,
+            FormData
         >({
-            query: ({ email, name, password }) => ({
+            query: form => ({
                 url: `/auth/register`,
                 method: "POST",
-                body: {
-                    name,
-                    email,
-                    password,
-                },
+                body: form,
             }),
 
-            transformResponse: (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+            transformResponse: (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
         }),
 
         updateUser: builder.mutation<
@@ -99,7 +99,7 @@ const authApi = createApi({
                 },
             }),
 
-            transformResponse: (res: UserRes) => UserSchema.parseAsync(res.user),
+            transformResponse: (res: UserRes) => UserSchema.parseAsync(res),
         }),
 
         resetPassword: builder.mutation<void, { oldPassword: string; newPassword: string }>({
@@ -123,7 +123,7 @@ const authApi = createApi({
 export const {
     useLoginUserMutation,
     useRegisterUserMutation,
-    useSignOutUserMutation,
+    useLogoutUserMutation,
     useUpdateUserMutation,
     useResetPasswordMutation,
     useDeleteUserMutation,
