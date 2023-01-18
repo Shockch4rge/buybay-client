@@ -16,7 +16,7 @@ import {
     WrapItem,
 } from "@chakra-ui/react";
 import { ProductImageGrid } from "./components/ProductImageGrid";
-import { FaArrowLeft, FaMinus, FaPlus, FaShoppingCart, FaStar } from "react-icons/fa";
+import { FaMinus, FaPlus, FaShoppingCart, FaStar } from "react-icons/fa";
 import { useState } from "react";
 import { ReviewCard } from "./components/ReviewCard";
 import { NavBar } from "../common/NavBar";
@@ -28,6 +28,7 @@ import { openModal } from "../../app/store/slices/ui/modals";
 import { CreateReviewModal } from "./components/CreateReviewModal";
 import { Footer } from "../common/Footer";
 import { useGetProductReviewsQuery } from "../../app/api/productReviews";
+import { BackButton } from "../common/BackButton";
 
 export const ProductPage: React.FC = () => {
     const { id } = useParams();
@@ -43,9 +44,7 @@ export const ProductPage: React.FC = () => {
     return <>
         <NavBar />
         <Container maxW={{ md: "3xl", lg: "5xl", xl: "8xl" }}>
-            <Button my={"6"} variant={"secondaryGhost"} leftIcon={<FaArrowLeft />} onClick={() => navigate(-1)}>
-                Back
-            </Button>
+            <BackButton />
             <Box>
                 <Heading>Product Information</Heading>
                 <Flex mt={"8"} p={"4"} direction={{ base: "column-reverse", lg: "row" }} gap={"8"} borderWidth={"thin"} borderRadius={"lg"}>
