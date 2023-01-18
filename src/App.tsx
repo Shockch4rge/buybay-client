@@ -10,6 +10,8 @@ import { useLazyGetCurrentUserQuery } from "./app/api/auth";
 import { LoginModal } from "./pages/common/LoginModal";
 import { RegisterModal } from "./pages/common/RegisterModal";
 import { ResetPasswordModal } from "./pages/common/ResetPasswordModal";
+import { SellProductPage } from "./pages/sell-product/SellProductPage";
+import { RegistrationPage } from "./pages/registration/RegistrationPage";
 
 const App: React.FC = () => {
     const { token } = useAuth();
@@ -26,6 +28,8 @@ const App: React.FC = () => {
             <Route index element={<HomePage/>}/>
             <Route path={AppRoutes.Cart} element={<CartPage />} />
             <Route path={AppRoutes.Product(":id")} element={<ProductPage />} />
+            <Route path={AppRoutes.SellProduct} element={<SellProductPage />} />
+            <Route path={AppRoutes.Registration} element={<RegistrationPage />} />
         </Routes>
         <LoginModal />
         <RegisterModal />
