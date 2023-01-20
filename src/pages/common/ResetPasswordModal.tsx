@@ -35,9 +35,6 @@ export const ResetPasswordModal: React.FC = () => {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    <Heading textAlign={"center"}>
-                        buybay
-                    </Heading>
                 </ModalHeader>
                 <ModalCloseButton />
                 <Formik
