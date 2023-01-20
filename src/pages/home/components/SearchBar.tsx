@@ -5,6 +5,7 @@ import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../../util/routes";
 import Highlighter from "react-highlight-words";
+import Utils from "../../../util/Utils";
 
 type SelectOption = {
     label: string;
@@ -33,15 +34,6 @@ const asyncComponents = {
     ,
 };
 
-const debounce = (fn: (...args: any[]) => any, delay : number) => {
-    let timeout: any;
-
-    return (...args: any[]) => {
-        clearTimeout(timeout);
-        timeout = setTimeout(() => fn(...args), delay);
-    };
-};
-
 function formatOptionLabel({ label }: SelectConfig, { inputValue }: FormatOptionLabelMeta<SelectConfig>) {
     return (
         <Highlighter
@@ -58,7 +50,7 @@ export const SearchBar: React.FC = () => {
     const [getProductsByCategory] = useLazyGetProductsByCategoryQuery();
 
     const debouncedSearch = useCallback(
-        debounce((inputValue: string, cb: (config: SelectConfig[]) => void) => {
+        Utils.debounce((inputValue: string, cb: (config: SelectConfig[]) => void) => {
             search({ query: inputValue })
                 .unwrap()
                 .then(result => cb([
