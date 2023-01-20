@@ -1,79 +1,53 @@
-import {
-    Button,
-    Flex,
-    Heading,
-    Popover,
-    PopoverArrow,
-    PopoverContent,
-    PopoverHeader,
-    PopoverTrigger,
-    VStack,
-} from "@chakra-ui/react";
+import { Button, Flex, Heading, HStack } from "@chakra-ui/react";
 import { FaShoppingCart } from "react-icons/fa";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../util/routes";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
+import { openModal } from "../../app/store/slices/ui/modals";
 import { useAuth } from "../../app/context/AuthContext";
 
 export const NavBar: React.FC = () => {
     const navigate = useNavigate();
+    const { user } = useAuth();
+    const cart = useAppSelector(state => state.cart);
 
-    return <Flex zIndex={1} align={"center"} h={"20"} w={"full"} p={"4"} bgColor={"white"} pos={"fixed"} justify={"space-between"}>
+    return <Flex
+        mb={"42"}
+        h={"20"}
+        p={"4"}
+        zIndex={1}
+        align={"center"}
+        bgColor={"white"}
+        justify={"space-between"}
+    >
         <Heading>
             buybay
         </Heading>
-        <Flex minW={"12"} justify={"space-around"}>
-            <AuthButton />
+
+        <HStack>
+            {user ? <AccountButton /> : <LoginButton />}
             <Button variant={"ghost"} leftIcon={<FaShoppingCart />} onClick={() => navigate(AppRoutes.Cart)}>
-                Cart ({4})
+                Cart ({cart.items.length})
             </Button>
-        </Flex>
+            <Button onClick={() => navigate(AppRoutes.SellProduct)} variant={"primary"}>
+                Sell
+            </Button>
+        </HStack>
     </Flex>;
 };
 
-export const AuthButton: React.FC = () => {
-    const { loginUser } = useAuth();
+const LoginButton: React.FC = () => {
+    const dispatch = useAppDispatch();
 
-    const signInButton = <Popover>
-        <PopoverTrigger>
-            <Button variant={"ghost"}>
-                Sign In
-            </Button>
-        </PopoverTrigger>
-        <PopoverContent>
-            <PopoverArrow />
-            <VStack p={"6"} justify={"center"}>
-                <Button w={"full"} variant={"primary"} onClick={() => loginUser({
+    return <Button variant={"ghost"} onClick={() => dispatch(openModal("login"))}>
+        Login
+    </Button>;
+};
 
-                })}>
-                    Sign In
-                </Button>
-                <Button w={"full"} variant={"ghost"}>
-                    Sign Up
-                </Button>
-            </VStack>
-        </PopoverContent>
-    </Popover>;
+const AccountButton = () => {
+    const navigate = useNavigate();
 
-    const accountButton = <Popover>
-        <PopoverTrigger>
-            <Button variant={"ghost"}>
-                Account
-            </Button>
-        </PopoverTrigger>
-        <PopoverContent>
-            <PopoverArrow />
-            <PopoverHeader textAlign={"center"}>
-                Account
-            </PopoverHeader>
-            <VStack p={"2"} justify={"center"}>
-                <Button w={"full"} onClick={() => logout({
-                    returnTo: window.location.origin,
-                })}>
-                    Sign Out
-                </Button>
-            </VStack>
-        </PopoverContent>
-    </Popover>;
-
-    return isAuthenticated ? accountButton : signInButton;
+    return <Button variant={"ghost"} onClick={() => navigate(AppRoutes.Account)}>
+        Account
+    </Button>;
 };
