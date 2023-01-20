@@ -53,10 +53,7 @@ const authApi = createApi({
             transformResponse: async (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
         }),
 
-        loginUser: builder.mutation<
-            AuthorizedRes,
-            Pick<User, "email"> & { password: string }
-        >({
+        loginUser: builder.mutation<AuthorizedRes, Pick<User, "email"> & { password: string }>({
             query: ({ email, password }) => ({
                 url: `/auth/login`,
                 method: "POST",
@@ -73,10 +70,7 @@ const authApi = createApi({
             }),
         }),
 
-        registerUser: builder.mutation<
-            AuthorizedRes,
-            FormData
-        >({
+        registerUser: builder.mutation<AuthorizedRes, FormData>({
             query: form => ({
                 url: `/auth/register`,
                 method: "POST",
@@ -86,17 +80,11 @@ const authApi = createApi({
             transformResponse: (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
         }),
 
-        updateUser: builder.mutation<
-            User,
-            Partial<Pick<User, "email" | "name">> & Pick<User, "id">
-        >({
-            query: ({id, email, name}) => ({
+        updateUser: builder.mutation<User, Pick<User, "id"> & { form: FormData }>({
+            query: ({ id, form }) => ({
                 url: `/auth/update/${id}`,
                 method: "PUT",
-                body: {
-                    email,
-                    name,
-                },
+                body: form,
             }),
 
             transformResponse: (res: UserRes) => UserSchema.parseAsync(res),
