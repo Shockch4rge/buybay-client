@@ -5,6 +5,7 @@ import productApi from "../api/products";
 import authSlice from "./slices/auth";
 import modalSlice from "./slices/ui/modals";
 import productReviewApi from "../api/productReviews";
+import ordersApi from "../api/orders";
 
 const uiReducer = combineReducers({
     [modalSlice.name]: modalSlice.reducer,
@@ -15,12 +16,18 @@ const store = configureStore({
         [authApi.reducerPath]: authApi.reducer,
         [productApi.reducerPath]: productApi.reducer,
         [productReviewApi.reducerPath]: productReviewApi.reducer,
+        [ordersApi.reducerPath]: ordersApi.reducer,
         [cartSlice.name]: cartSlice.reducer,
         [authSlice.name]: authSlice.reducer,
         ui: uiReducer,
     },
     middleware: getDM => getDM()
-        .concat(authApi.middleware, productApi.middleware, productReviewApi.middleware),
+        .concat(
+            authApi.middleware,
+            productApi.middleware,
+            productReviewApi.middleware,
+            ordersApi.middleware,
+        ),
 });
 
 export type Store = typeof store;
