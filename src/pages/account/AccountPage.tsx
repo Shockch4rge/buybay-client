@@ -1,7 +1,7 @@
 import { Container, Heading, Tab, TabList, TabPanels, Tabs } from "@chakra-ui/react";
 import { Footer } from "../common/Footer";
 import { BackButton } from "../common/BackButton";
-import { FaBook, FaDollarSign } from "react-icons/all";
+import { FaDollarSign, FaUser } from "react-icons/all";
 import { FaShoppingCart } from "react-icons/fa";
 import { ProfileTab } from "./components/ProfileTab";
 import { OrdersTab } from "./components/OrdersTab";
@@ -20,7 +20,7 @@ export const AccountPage: React.FC = () => {
                 defaultIndex={Number(localStorage.getItem("account-tab-idx")) ?? 0}
             >
                 <TabList gap={"2"} p={"2"} bg={"gray.50"} borderRadius={"12"}>
-                    <Tab borderRadius={"10"}><FaBook/>&nbsp; Profile</Tab>
+                    <Tab borderRadius={"10"}><FaUser/>&nbsp; Profile</Tab>
                     <Tab borderRadius={"10"}><FaShoppingCart/>&nbsp; Orders</Tab>
                     <Tab borderRadius={"10"}><FaDollarSign/>&nbsp; Sales</Tab>
                 </TabList>
