@@ -8,7 +8,6 @@ import { useAuth } from "./app/context/AuthContext";
 import React, { useEffect } from "react";
 import { useLazyGetCurrentUserQuery } from "./app/api/auth";
 import { LoginModal } from "./pages/common/LoginModal";
-import { RegisterModal } from "./pages/common/RegisterModal";
 import { ResetPasswordModal } from "./pages/common/ResetPasswordModal";
 import { SellProductPage } from "./pages/sell-product/SellProductPage";
 import { RegistrationPage } from "./pages/registration/RegistrationPage";
@@ -34,7 +33,6 @@ const App: React.FC = () => {
             <Route path={AppRoutes.Account} element={<AccountPage />} />
         </Routes>
         <LoginModal />
-        <RegisterModal />
         <ResetPasswordModal />
     </>;
 };
