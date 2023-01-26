@@ -29,23 +29,28 @@ import { CreateReviewModal } from "./components/CreateReviewModal";
 import { Footer } from "../common/Footer";
 import { useGetProductReviewsQuery } from "../../app/api/productReviews";
 import { BackButton } from "../common/BackButton";
+import { useAuth } from "../../app/context/AuthContext";
+import { EmptyContent } from "../common/EmptyContent";
 
 export const ProductPage: React.FC = () => {
     const { id } = useParams();
-    const [cartQuantity, setCartQuantity] = useState(1);
-    const { data: product } = useGetProductQuery(id!);
-    const { data: reviews } = useGetProductReviewsQuery(id!);
+    const { user } = useAuth();
     const toast = useToast();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [cartQuantity, setCartQuantity] = useState(1);
+    const { data: product } = useGetProductQuery(id!);
+    const { data: reviews } = useGetProductReviewsQuery(id!);
 
     if (!product || !reviews) return <></>;
+
+    const isOwnProduct = user?.id === product.sellerId;
 
     return <>
         <NavBar />
         <Container maxW={{ md: "3xl", lg: "5xl", xl: "8xl" }}>
             <BackButton />
-            <Box>
+            <Box mt={"12"}>
                 <Heading>Product Information</Heading>
                 <Flex mt={"8"} p={"4"} direction={{ base: "column-reverse", lg: "row" }} gap={"8"} borderWidth={"thin"} borderRadius={"lg"}>
                     <ProductImageGrid urls={product.images.map(i => i.url)} />
@@ -89,54 +94,69 @@ export const ProductPage: React.FC = () => {
                             Added on {new Date(product.createdAt).toLocaleDateString()}
                         </Text>
 
-                        <HStack pos={"absolute"} bottom={"8"} right={"8"} spacing={"6"}>
-                            <Text fontSize={"lg"} fontWeight={"bold"}>Quantity:</Text>
-                            <HStack spacing={"4"}>
-                                <IconButton
-                                    variant={"ghost"}
-                                    aria-label={"Decrease Quantity"}
-                                    icon={<FaMinus/>}
-                                    disabled={cartQuantity <= 1}
-                                    onClick={() => setCartQuantity(q => q - 1)}
-                                />
-                                <Heading size={"md"}>{cartQuantity}</Heading>
-                                <IconButton
-                                    variant={"ghost"}
-                                    aria-label={"Increase Quantity"}
-                                    icon={<FaPlus/>}
-                                    disabled={cartQuantity >= product.quantity}
-                                    onClick={() => setCartQuantity(q => q + 1)}
-                                />
+                        {product.sellerId !== user?.id
+                            ?
+                            <HStack pos={"absolute"} bottom={"8"} right={"8"} spacing={"6"}>
+                                <Text fontSize={"lg"} fontWeight={"bold"}>Quantity:</Text>
+                                <HStack spacing={"4"}>
+                                    <IconButton
+                                        variant={"ghost"}
+                                        aria-label={"Decrease Quantity"}
+                                        icon={<FaMinus/>}
+                                        disabled={cartQuantity <= 1}
+                                        onClick={() => setCartQuantity(q => q - 1)}
+                                    />
+                                    <Heading size={"md"}>{cartQuantity}</Heading>
+                                    <IconButton
+                                        variant={"ghost"}
+                                        aria-label={"Increase Quantity"}
+                                        icon={<FaPlus/>}
+                                        disabled={cartQuantity >= product.quantity}
+                                        onClick={() => setCartQuantity(q => q + 1)}
+                                    />
+                                </HStack>
+                                {product.quantity > 0
+                                    ? <Button
+                                        variant={"primary"}
+                                        leftIcon={<FaShoppingCart />}
+                                        onClick={() => {
+                                            dispatch(cartAdd(product));
+                                            toast({
+                                                title: `Added ${cartQuantity} items to cart!`,
+                                                duration: 2000,
+                                            });
+                                        }}>
+                                        Add to Cart
+                                    </Button>
+                                    : <Button disabled>
+                                        Sold Out
+                                    </Button>
+                                }
                             </HStack>
-                            {product.quantity > 0
-                                ? <Button
-                                    variant={"primary"}
-                                    leftIcon={<FaShoppingCart />}
-                                    onClick={() => {
-                                        dispatch(cartAdd(product));
-                                        toast({
-                                            title: `Added ${cartQuantity} items to cart!`,
-                                        });
-                                    }}>
-                                    Add to Cart
-                                </Button>
-                                : <Button disabled>
-                                    Sold Out
-                                </Button>
-                            }
-                        </HStack>
+                            :
+                            <HStack pos={"absolute"} bottom={"8"} right={"8"} spacing={"6"}>
+                                <Button variant={"primary"}>Edit Details</Button>
+                            </HStack>
+                        }
                     </Box>
                 </Flex>
             </Box>
 
             <VStack align={"start"} spacing={"8"}>
-                <Heading mt={"24"}>Reviews (3)</Heading>
-                <Button onClick={() => dispatch(openModal("createReview"))}>
-                    Write a review
+                <Heading mt={"24"}>Reviews ({reviews.length})</Heading>
+                <Button onClick={() => dispatch(openModal("createReview"))} disabled={isOwnProduct}>
+                    {isOwnProduct ? "You can't write a review for your own product." : "Write a review"}
                 </Button>
-                <VStack w={"full"} spacing={"8"}>
-                    {reviews.map(r => <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />)}
-                </VStack>
+                {reviews.length === 0
+                    ?
+                    <EmptyContent>
+                        There are no reviews for this product yet!
+                    </EmptyContent>
+                    :
+                    <VStack w={"full"} spacing={"8"}>
+                        {reviews.map(r => <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />)}
+                    </VStack>
+                }
             </VStack>
         </Container>
         <Footer/>
