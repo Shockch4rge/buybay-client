@@ -29,6 +29,7 @@ import {
 import { useAuth } from "../../app/context/AuthContext";
 import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import { closeModal, openModal } from "../../app/store/slices/ui/modals";
+import { AppRoutes } from "../../util/routes";
 
 const loginModalName = "login";
 const emailFieldName = "email";
@@ -48,7 +49,6 @@ export const LoginModal: React.FC = () => {
             <ModalOverlay />
             <ModalContent>
                 <ModalHeader>
-                    <Heading textAlign={"center"}>buybay</Heading>
                 </ModalHeader>
                 <ModalCloseButton />
                 <Formik
@@ -67,7 +67,7 @@ export const LoginModal: React.FC = () => {
                 >
                     {({ errors, touched, isSubmitting, isValid, getFieldProps }) => 
                         <ModalBody>
-                            <Heading textAlign="center" size="lg">
+                            <Heading size="lg">
                                 Login <Hide below="md">to your account</Hide>
                             </Heading>
 
@@ -177,9 +177,7 @@ export const LoginModal: React.FC = () => {
                                 cursor="pointer"
                                 onClick={() => {
                                     close();
-                                    setTimeout(() => {
-                                        dispatch(openModal("register"));
-                                    }, 300);
+                                    navigate(AppRoutes.Registration);
                                 }}
                             >
                                 <a>Create Account</a>
