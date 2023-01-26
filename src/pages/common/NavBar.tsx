@@ -20,7 +20,10 @@ export const NavBar: React.FC = () => {
         bgColor={"white"}
         justify={"space-between"}
     >
-        <Heading>
+        <Heading
+            onClick={() => navigate(AppRoutes.Home)}
+            cursor={"pointer"}
+        >
             buybay
         </Heading>
 
