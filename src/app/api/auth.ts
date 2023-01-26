@@ -98,10 +98,11 @@ const authApi = createApi({
             }),
         }),
 
-        deleteUser: builder.mutation<void, void>({
-            query: () => ({
+        deleteUser: builder.mutation<void, { password: string }>({
+            query: body => ({
                 url: `/auth/destroy`,
                 method: "DELETE",
+                body,
             }),
         }),
     }),
