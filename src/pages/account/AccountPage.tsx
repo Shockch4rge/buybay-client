@@ -23,7 +23,7 @@ export const AccountPage: React.FC = () => {
             >
                 <TabList gap={"2"} p={"2"} bg={"gray.50"} borderRadius={"12"}>
                     <Tab borderRadius={"10"}><FaUser/>&nbsp; Profile</Tab>
-                    <Tab borderRadius={"10"}><FaPen/>&nbsp; Listed Products</Tab>
+                    <Tab borderRadius={"10"}><FaPen/>&nbsp; Products</Tab>
                     <Tab borderRadius={"10"}><FaShoppingCart/>&nbsp; Orders</Tab>
                     <Tab borderRadius={"10"}><FaDollarSign/>&nbsp; Sales</Tab>
                 </TabList>
