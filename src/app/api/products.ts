@@ -3,11 +3,26 @@ import { RootState } from "../store";
 import { Res } from "./index";
 import { Product, ProductCategory, ProductCategorySchema, ProductSchema } from "../../util/models/Product";
 import cacheUtils from "../../util/cacheUtils";
+import { User } from "../../util/models/User";
 
 const Tag = {
     Products: "Product",
     Categories: "ProductCategory",
 };
+
+type SearchQueryBody = {
+    query: string;
+    limit?: number;
+} & ({
+    includeProducts?: false;
+    includeCategories?: true;
+} | {
+    includeProducts?: true;
+    includeCategories?: false;
+} | {
+    includeProducts?: true;
+    includeCategories?: true;
+});
 
 const productsApi = createApi({
     reducerPath: "products",
@@ -49,11 +64,11 @@ const productsApi = createApi({
             providesTags: cacheUtils.cacheByIdArg(Tag.Products),
         }),
         
-        addProduct: builder.mutation<Product, Omit<Product, "createdAt" | "id" | "updatedAt">>({
-            query: product => ({
+        addProduct: builder.mutation<Product, FormData>({
+            query: form => ({
                 url: "/products",
                 method: "POST",
-                body: product,
+                body: form,
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
@@ -70,11 +85,11 @@ const productsApi = createApi({
             invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
-        updateProduct: builder.mutation<Product, Partial<Omit<Product, "createdAt" | "updatedAt">>>({
-            query: product => ({
-                url: `/products/${product.id}`,
+        updateProduct: builder.mutation<Product, { id: Product["id"]; body: FormData }>({
+            query: ({ id, body }) => ({
+                url: `/products/${id}`,
                 method: "PUT",
-                body: product,
+                body,
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
@@ -82,9 +97,9 @@ const productsApi = createApi({
             invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
-        getAllCategories: builder.query<ProductCategory[], void>({
-            query: () => ({
-                url: "/categories",
+        getAllCategories: builder.query<ProductCategory[], { limit?: number }>({
+            query: ({ limit }) => ({
+                url: limit ? `/categories?limit=${limit}` : `/categories`,
                 method: "GET",
             }),
 
@@ -94,9 +109,9 @@ const productsApi = createApi({
             providesTags: cacheUtils.providesList(Tag.Categories),
         }),
 
-        search: builder.query<{ products: Product[]; categories: ProductCategory[] }, { query: string }>({
-            query: ({ query }) => ({
-                url: `/products/search/${query}`,
+        search: builder.query<{ products: Product[]; categories: ProductCategory[] }, SearchQueryBody>({
+            query: ({ query, includeProducts = true, includeCategories = true, limit }) => ({
+                url: `/products/search/${query}/${includeProducts}/${includeCategories}/${limit ?? ""}`,
                 method: "GET",
             }),
 
@@ -116,7 +131,33 @@ const productsApi = createApi({
                 method: "GET",
             }),
     
-            transformResponse: (res: Res<{ products: Product[] }>) => Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+            transformResponse: (res: Res<{ products: Product[] }>) =>
+                Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
+
+            providesTags: cacheUtils.providesList(Tag.Products),
+        }),
+
+        addProductCategories: builder.mutation<ProductCategory[], Array<Pick<ProductCategory, "name">>>({
+            query: body => ({
+                url: `/categories`,
+                method: "POST",
+                body,
+            }),
+
+            transformResponse: (res: Res<{ categories: ProductCategory[] }>) =>
+                Promise.all(res.categories.map(c => ProductCategorySchema.parseAsync(c))),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.Categories),
+        }),
+
+        getUserProducts: builder.query<Product[], User["id"]>({
+            query: id => ({
+                url: `/user/${id}/products`,
+                method: "GET",
+            }),
+
+            transformResponse: (res: Res<{ products: Product[] }>) =>
+                Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
 
             providesTags: cacheUtils.providesList(Tag.Products),
         }),
@@ -124,9 +165,13 @@ const productsApi = createApi({
 });
 
 export const {
+    useGetUserProductsQuery,
     useGetProductQuery,
+    useLazyGetProductQuery,
     useGetAllCategoriesQuery,
     useLazySearchQuery,
+    useAddProductMutation,
+    useAddProductCategoriesMutation,
     useLazyGetProductsByCategoryQuery,
 } = productsApi;
 
