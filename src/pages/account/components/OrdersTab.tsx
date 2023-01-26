@@ -21,6 +21,7 @@ import { AppRoutes } from "../../../util/routes";
 import { Order } from "../../../util/models/Order";
 import { useGetProductQuery } from "../../../app/api/products";
 import { useNavigate } from "react-router-dom";
+import { EmptyContent } from "../../common/EmptyContent";
 
 export const OrdersTab: React.FC = () => {
     const { user } = useAuth();
@@ -47,12 +48,11 @@ export const OrdersTab: React.FC = () => {
         {orders &&
             (orders.length === 0 
                 ?
-                <Center my={"12"} w={"full"} h={"48"} borderWidth={"medium"} borderStyle={"dashed"} borderRadius={"10"}>
+                <EmptyContent mt={"8"}>
                     <Heading size={"sm"}>You haven&apos;t made any orders!</Heading>
-                </Center>
+                </EmptyContent>
                 :
                 <VStack spacing={"4"}>
-
                     {orders.map(o => <OrderCard key={`order-card-${o.id}`} order={o} />)}
                 </VStack>
             )

@@ -2,7 +2,6 @@ import {
     Button,
     Card,
     CardBody,
-    Center,
     Heading,
     Hide,
     HStack,
@@ -20,6 +19,7 @@ import { useAuth } from "../../../app/context/AuthContext";
 import { Product } from "../../../util/models/Product";
 import { AppRoutes } from "../../../util/routes";
 import { useNavigate } from "react-router-dom";
+import { EmptyContent } from "../../common/EmptyContent";
 
 
 export const ListedProductsTab: React.FC = () => {
@@ -31,9 +31,9 @@ export const ListedProductsTab: React.FC = () => {
         {products &&
             (products.length === 0
                 ?
-                <Center my={"12"} w={"full"} h={"48"} borderWidth={"medium"} borderStyle={"dashed"} borderRadius={"10"}>
+                <EmptyContent>
                     <Heading size={"sm"}>You haven&apos;t listed any products!</Heading>
-                </Center>
+                </EmptyContent>
                 :
                 <VStack spacing={"4"}>
                     {products.map(p => <ProductCard key={`product-card-${p.id}`} product={p} />)}

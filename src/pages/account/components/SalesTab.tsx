@@ -2,7 +2,6 @@ import {
     Button,
     Card,
     CardBody,
-    Center,
     Heading,
     Hide,
     Image,
@@ -33,6 +32,7 @@ import {
     Tooltip,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
+import { EmptyContent } from "../../common/EmptyContent";
 
 ChartJS.register(LineElement, BarElement, Tooltip, CategoryScale, LinearScale, PointElement, Legend);
 
@@ -136,9 +136,9 @@ export const SalesTab: React.FC = () => {
         {sales &&
             (sales.length === 0
                 ?
-                <Center my={"12"} w={"full"} h={"48"} borderWidth={"medium"} borderStyle={"dashed"} borderRadius={"10"}>
+                <EmptyContent mt={"8"}>
                     <Heading size={"sm"}>You haven&apos;t made any sales!</Heading>
-                </Center>
+                </EmptyContent>
                 :
                 <VStack spacing={"4"}>
                     {sales.map(o => <SaleCard key={`order-card-${o.id}`} order={o} />)}
