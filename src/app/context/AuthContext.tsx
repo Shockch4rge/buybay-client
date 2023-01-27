@@ -53,11 +53,6 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
             navigate(AppRoutes.Home, { replace: true });
         }
 
-        // navigate(AppRoutes., { replace: true });
-        //
-        // refreshAuth().unwrap().then(() => {
-        // 	navigate(AppRoutes.Board, { replace: true });
-        // })
     }, [token, user]);
 
     const loginUser = useCallback(
@@ -70,9 +65,10 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
                 });
             }
             catch (e) {
+                console.log(e);
                 toast({
                     status: "error",
-                    description: (e as any).data.status.message,
+                    description: (e as any).data.message,
                 });
             }
         }, []);
@@ -100,10 +96,10 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
     const registerUser = useCallback(
         async (params: MutationParams<typeof useRegisterUserMutation>) => {
             try {
-                const result = await register(params).unwrap();
+                await register(params).unwrap();
                 toast({
                     status: "success",
-                    description: "Created your account!",
+                    description: "Account registered! Welcome to buybay!",
                 });
             }
             catch (e) {
