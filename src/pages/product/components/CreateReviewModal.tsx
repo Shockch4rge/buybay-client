@@ -25,6 +25,7 @@ import {
     SliderTrack,
     Spinner,
     Text,
+    Textarea,
     VStack,
 } from "@chakra-ui/react";
 import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
@@ -33,6 +34,7 @@ import { useAddProductReviewMutation } from "../../../app/api/productReviews";
 import { FaStar } from "react-icons/fa";
 import { useState } from "react";
 import { Product } from "../../../util/models/Product";
+import { useAuth } from "../../../app/context/AuthContext";
 
 const titleField = "title";
 const descriptionField = "description";
@@ -50,6 +52,7 @@ interface Props {
 export const CreateReviewModal: React.FC<Props> = ({ product }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const { user } = useAuth();
     const [rating, setRating] = useState(1);
     const [addReview] = useAddProductReviewMutation();
     const { open } = useAppSelector(state => state.ui.modals.createReview);
@@ -63,14 +66,14 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
                 <ModalHeader></ModalHeader>
                 <ModalCloseButton />
                 <Formik
-                    validationSchema={ReviewSchema}
+                    validationSchema={Schema}
                     initialValues={{
                         [titleField]: "",
                         [descriptionField]: "",
                     }}
                     onSubmit={async ({ title, description }) => {
                         await addReview({
-                            author_id: "user1",
+                            author_id: user!.id,
                             product_id: product.id,
                             title,
                             description,
@@ -113,7 +116,7 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
                                                     Description
                                                 </FormLabel>
                                                 <InputGroup>
-                                                    <Input
+                                                    <Textarea
                                                         {...getFieldProps(descriptionField)}
                                                         id={descriptionField}
                                                         placeholder="Description"
@@ -181,7 +184,7 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
     );
 };
 
-const ReviewSchema = Yup.object().shape({
+const Schema = Yup.object().shape({
     [titleField]: Yup.string()
         .required("Review title is required.")
         .min(3, "Review title is too short.")
