@@ -26,6 +26,7 @@ import { LoginModal } from "../common/LoginModal";
 import { openModal } from "../../app/store/slices/ui/modals";
 import { useAppDispatch } from "../../app/store/hooks";
 import { useAuth } from "../../app/context/AuthContext";
+import { AppRoutes } from "../../util/routes";
 
 const fields = {
     name: "name",
@@ -67,6 +68,7 @@ export const RegistrationPage: React.FC = () => {
                     }
 
                     await registerUser(formData);
+                    navigate(AppRoutes.Home, { replace: true });
                 }}
             >
                 {({ errors, touched, isSubmitting, isValid, dirty, getFieldProps }) =>
