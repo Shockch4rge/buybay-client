@@ -2,6 +2,7 @@ import {
     Box,
     Button,
     Container,
+    Divider,
     Flex,
     Heading,
     HStack,
@@ -18,7 +19,7 @@ import {
 import { ProductImageGrid } from "./components/ProductImageGrid";
 import { FaMinus, FaPlus, FaShoppingCart, FaStar } from "react-icons/fa";
 import { useState } from "react";
-import { ReviewCard } from "./components/ReviewCard";
+import { ReviewCard, SessionUserReviewCard } from "./components/ReviewCard";
 import { NavBar } from "../common/NavBar";
 import { useDispatch } from "react-redux";
 import { cartAdd } from "../../app/store/slices/cart";
@@ -31,6 +32,7 @@ import { useGetProductReviewsQuery } from "../../app/api/productReviews";
 import { BackButton } from "../common/BackButton";
 import { useAuth } from "../../app/context/AuthContext";
 import { EmptyContent } from "../common/EmptyContent";
+import { EditReviewModal } from "./components/EditReviewModal";
 
 export const ProductPage: React.FC = () => {
     const { id } = useParams();
@@ -45,6 +47,8 @@ export const ProductPage: React.FC = () => {
     if (!product || !reviews) return <></>;
 
     const isOwnProduct = user?.id === product.sellerId;
+    const hasWrittenReview = reviews.some(r => r.authorId === user?.id);
+    const ownReview = reviews.find(r => r.authorId === user?.id);
 
     return <>
         <NavBar />
@@ -144,9 +148,26 @@ export const ProductPage: React.FC = () => {
 
             <VStack align={"start"} spacing={"8"}>
                 <Heading mt={"24"}>Reviews ({reviews.length})</Heading>
-                <Button onClick={() => dispatch(openModal("createReview"))} disabled={isOwnProduct}>
-                    {isOwnProduct ? "You can't write a review for your own product." : "Write a review"}
-                </Button>
+                {/* TODO: add back disabled flag */}
+                {/*<Button onClick={() => dispatch(openModal("createReview"))} disabled={isOwnProduct || hasWrittenReview}>*/}
+                {/*    {isOwnProduct*/}
+                {/*        ? "You can't write a review for your own product."*/}
+                {/*        : hasWrittenReview*/}
+                {/*            ? "You've already reviewed this product."*/}
+                {/*            : "Write a review"}*/}
+                {/*</Button>*/}
+                {ownReview &&
+                    <VStack w={"full"} my={"20"} align={"start"} spacing={"8"}>
+                        <Heading size={"md"}>Your Review</Heading>
+                        <SessionUserReviewCard review={ownReview} />
+                    </VStack>
+                }
+                {!ownReview
+                    ? <Button onClick={() => dispatch(openModal("createReview"))}>
+                        Write a review
+                    </Button>
+                    : <Divider w={"full"} />
+                }
                 {reviews.length === 0
                     ?
                     <EmptyContent>
@@ -154,12 +175,18 @@ export const ProductPage: React.FC = () => {
                     </EmptyContent>
                     :
                     <VStack w={"full"} spacing={"8"}>
-                        {reviews.map(r => <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />)}
+                        {reviews.filter(r => r.authorId !== user?.id).map(r =>
+                            <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />,
+                        )}
+                        {/*{reviews.map(r =>*/}
+                        {/*    <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />,*/}
+                        {/*)}*/}
                     </VStack>
                 }
             </VStack>
         </Container>
         <Footer/>
         <CreateReviewModal product={product}/>
+        {ownReview && <EditReviewModal review={ownReview} />}
     </>;
 };

@@ -4,7 +4,7 @@ interface BaseModalState {
     open: boolean;
 }
 
-type ModalTypes = "createReview" | "deleteAccount" | "login" | "register" | "resetPassword";
+type ModalTypes = "createReview" | "deleteAccount" | "editReview" | "login" | "register" | "resetPassword";
 
 const initialState: Record<ModalTypes, BaseModalState> = {
     login: {
@@ -17,6 +17,9 @@ const initialState: Record<ModalTypes, BaseModalState> = {
         open: false,
     },
     createReview: {
+        open: false,
+    },
+    editReview: {
         open: false,
     },
     deleteAccount: {

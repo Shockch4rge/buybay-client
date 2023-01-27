@@ -51,6 +51,22 @@ const productReviewApi = createApi({
 
             invalidatesTags: cacheUtils.invalidatesList(Tags.ProductReviews),
         }),
+        
+        updateProductReview: builder.mutation<
+            ProductReview,
+            Partial<Pick<ProductReviewJSON, "description" |"rating" | "title">> & Pick<ProductReviewJSON, "id">
+        >({
+            query: review => ({
+                url: `/product-reviews/${review.id}`,
+                method: "PUT",
+                body: review,
+            }),
+
+            transformResponse: (res: Res<{ review: ProductReview }>) =>
+                ProductReviewSchema.parseAsync(res.review),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tags.ProductReviews),
+        }),
 
         deleteProductReview: builder.mutation<void, ProductReview["id"]>({
             query: id => ({
@@ -66,6 +82,7 @@ const productReviewApi = createApi({
 export const {
     useGetProductReviewsQuery,
     useAddProductReviewMutation,
+    useUpdateProductReviewMutation,
     useDeleteProductReviewMutation,
 } = productReviewApi;
 
