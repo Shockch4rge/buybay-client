@@ -44,13 +44,13 @@ const authApi = createApi({
             transformResponse: (res: UserRes) => UserResSchema.parseAsync(res),
         }),
 
-        getUser: builder.query<AuthorizedRes, User["id"]>({
+        getUser: builder.query<User, User["id"]>({
             query: userId => ({
                 url: `/auth/${userId}`,
                 method: "GET",
             }),
 
-            transformResponse: async (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
+            transformResponse: async (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
         loginUser: builder.mutation<AuthorizedRes, Pick<User, "email"> & { password: string }>({
@@ -110,6 +110,7 @@ const authApi = createApi({
 
 
 export const {
+    useGetUserQuery,
     useLoginUserMutation,
     useRegisterUserMutation,
     useLogoutUserMutation,
