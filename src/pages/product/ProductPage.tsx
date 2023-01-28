@@ -8,6 +8,12 @@ import {
     HStack,
     IconButton,
     Link,
+    Menu,
+    MenuButton,
+    MenuDivider,
+    MenuItemOption,
+    MenuList,
+    MenuOptionGroup,
     Tag,
     TagLabel,
     Text,
@@ -17,8 +23,8 @@ import {
     WrapItem,
 } from "@chakra-ui/react";
 import { ProductImageGrid } from "./components/ProductImageGrid";
-import { FaMinus, FaPlus, FaShoppingCart, FaStar } from "react-icons/fa";
-import { useState } from "react";
+import { FaMinus, FaPlus, FaShoppingCart, FaSort, FaStar } from "react-icons/fa";
+import { useCallback, useState } from "react";
 import { ReviewCard, SessionUserReviewCard } from "./components/ReviewCard";
 import { NavBar } from "../common/NavBar";
 import { useDispatch } from "react-redux";
@@ -34,6 +40,9 @@ import { useAuth } from "../../app/context/AuthContext";
 import { EmptyContent } from "../common/EmptyContent";
 import { EditReviewModal } from "./components/EditReviewModal";
 import { AppRoutes } from "../../util/routes";
+import { ProductReview } from "../../util/models/ProductReview";
+
+type SortType = "highestRating" | "lowestRating" | "newest" | "oldest";
 
 export const ProductPage: React.FC = () => {
     const { id } = useParams();
@@ -41,6 +50,7 @@ export const ProductPage: React.FC = () => {
     const toast = useToast();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [sorting, setSorting] = useState<SortType>("highestRating");
     const [cartQuantity, setCartQuantity] = useState(1);
     const { data: product } = useGetProductQuery(id!);
     const { data: reviews } = useGetProductReviewsQuery(id!);
@@ -50,6 +60,21 @@ export const ProductPage: React.FC = () => {
     const isOwnProduct = user?.id === product.sellerId;
     const hasWrittenReview = reviews.some(r => r.authorId === user?.id);
     const ownReview = reviews.find(r => r.authorId === user?.id);
+
+    const sortReviews = useCallback((reviews: ProductReview[]) => {
+        switch (sorting) {
+            case "highestRating":
+                return reviews.sort((a, b) => b.rating - a.rating);
+            case "lowestRating":
+                return reviews.sort((a, b) => a.rating - b.rating);
+            case "newest":
+                return reviews.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+            case "oldest":
+                return reviews.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime());
+            default:
+                return reviews;
+        }
+    }, [reviews]);
 
     return <>
         <NavBar />
@@ -83,6 +108,7 @@ export const ProductPage: React.FC = () => {
                                 </WrapItem>,
                             )}
                         </Wrap>
+
                         <Text mt={"8"} fontSize={"lg"} fontWeight={"bold"}>
                             Description:
                         </Text>
@@ -171,6 +197,32 @@ export const ProductPage: React.FC = () => {
                     </Button>
                     : <Divider w={"full"} />
                 }
+                <Menu>
+                    <MenuButton variant={"ghost"} as={Button} rightIcon={<FaSort />}>
+                        Sort by
+                    </MenuButton>
+                    <MenuList>
+                        <MenuOptionGroup
+                            defaultValue={sorting}
+                            type={"radio"}
+                            onChange={value => setSorting(value as SortType)}
+                        >
+                            <MenuItemOption value={"newest"}>
+                                Newest
+                            </MenuItemOption>
+                            <MenuItemOption value={"oldest"}>
+                                Oldest
+                            </MenuItemOption>
+                            <MenuDivider />
+                            <MenuItemOption value={"highestRating"}>
+                                Highest
+                            </MenuItemOption>
+                            <MenuItemOption value={"lowestRating"}>
+                                Lowest
+                            </MenuItemOption>
+                        </MenuOptionGroup>
+                    </MenuList>
+                </Menu>
                 {reviews.length === 0
                     ?
                     <EmptyContent>
@@ -178,12 +230,9 @@ export const ProductPage: React.FC = () => {
                     </EmptyContent>
                     :
                     <VStack w={"full"} spacing={"8"}>
-                        {reviews.filter(r => r.authorId !== user?.id).map(r =>
+                        {sortReviews(reviews.filter(r => r.authorId !== user?.id)).map(r =>
                             <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />,
                         )}
-                        {/*{reviews.map(r =>*/}
-                        {/*    <ReviewCard key={`product-${product.id}-review-${r.id}`} review={r} />,*/}
-                        {/*)}*/}
                     </VStack>
                 }
             </VStack>
