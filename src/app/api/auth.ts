@@ -35,6 +35,15 @@ const authApi = createApi({
     }),
 
     endpoints: builder => ({
+        getUser: builder.query<User, User["id"]>({
+            query: userId => ({
+                url: `/users/${userId}`,
+                method: "GET",
+            }),
+
+            transformResponse: async (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+        }),
+
         getCurrentUser: builder.query<UserRes, void>({
             query: () => ({
                 url: "/auth/me",
@@ -42,15 +51,6 @@ const authApi = createApi({
             }),
 
             transformResponse: (res: UserRes) => UserResSchema.parseAsync(res),
-        }),
-
-        getUser: builder.query<User, User["id"]>({
-            query: userId => ({
-                url: `/auth/${userId}`,
-                method: "GET",
-            }),
-
-            transformResponse: async (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
         }),
 
         loginUser: builder.mutation<AuthorizedRes, Pick<User, "email"> & { password: string }>({
