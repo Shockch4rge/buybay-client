@@ -12,6 +12,7 @@ import { ResetPasswordModal } from "./pages/common/ResetPasswordModal";
 import { SellProductPage } from "./pages/sell-product/SellProductPage";
 import { RegistrationPage } from "./pages/registration/RegistrationPage";
 import { AccountPage } from "./pages/account/AccountPage";
+import { EditProductPage } from "./pages/edit-product/EditProductPage";
 
 const App: React.FC = () => {
     const { token } = useAuth();
@@ -29,6 +30,7 @@ const App: React.FC = () => {
             <Route path={AppRoutes.Cart} element={<CartPage />} />
             <Route path={AppRoutes.Product(":id")} element={<ProductPage />} />
             <Route path={AppRoutes.SellProduct} element={<SellProductPage />} />
+            <Route path={AppRoutes.EditProduct(":id")} element={<EditProductPage />} />
             <Route path={AppRoutes.Registration} element={<RegistrationPage />} />
             <Route path={AppRoutes.Account} element={<AccountPage />} />
         </Routes>

@@ -33,6 +33,7 @@ import { BackButton } from "../common/BackButton";
 import { useAuth } from "../../app/context/AuthContext";
 import { EmptyContent } from "../common/EmptyContent";
 import { EditReviewModal } from "./components/EditReviewModal";
+import { AppRoutes } from "../../util/routes";
 
 export const ProductPage: React.FC = () => {
     const { id } = useParams();
@@ -139,7 +140,9 @@ export const ProductPage: React.FC = () => {
                             </HStack>
                             :
                             <HStack pos={"absolute"} bottom={"8"} right={"8"} spacing={"6"}>
-                                <Button variant={"primary"}>Edit Details</Button>
+                                <Button variant={"primary"} onClick={() => navigate(AppRoutes.EditProduct(product.id))}>
+                                    Edit Details
+                                </Button>
                             </HStack>
                         }
                     </Box>
