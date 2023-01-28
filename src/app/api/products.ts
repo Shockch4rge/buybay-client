@@ -85,11 +85,11 @@ const productsApi = createApi({
             invalidatesTags: cacheUtils.invalidatesList(Tag.Products),
         }),
 
-        updateProduct: builder.mutation<Product, { id: Product["id"]; body: FormData }>({
-            query: ({ id, body }) => ({
-                url: `/products/${id}`,
-                method: "PUT",
-                body,
+        updateProduct: builder.mutation<Product, Pick<Product, "id"> & { data: FormData }>({
+            query: ({ id, data }) => ({
+                url: `/products/${id}?_method=PUT`,
+                method: "POST",
+                body: data,
             }),
 
             transformResponse: (res: Res<{ product: Product }>) => ProductSchema.parseAsync(res.product),
@@ -171,6 +171,7 @@ export const {
     useGetAllCategoriesQuery,
     useLazySearchQuery,
     useAddProductMutation,
+    useUpdateProductMutation,
     useAddProductCategoriesMutation,
     useLazyGetProductsByCategoryQuery,
 } = productsApi;
