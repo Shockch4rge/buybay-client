@@ -12,10 +12,14 @@ export const ProductImageSchema = z.object({
     product_id: z.string(),
     url: z.string(),
     is_thumbnail: z.boolean(),
+    created_at: z.string(),
+    updated_at: z.string(),
 }).transform(raw => ({
     productId: raw.product_id,
     url: raw.url,
     isThumbnail: raw.is_thumbnail,
+    createdAt: raw.created_at,
+    updatedAt: raw.updated_at,
 }));
 
 export const ProductSchema = z.object({
