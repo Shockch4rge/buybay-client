@@ -1,6 +1,6 @@
 import { Box } from "@chakra-ui/react";
 import { AsyncSelect, chakraComponents, FormatOptionLabelMeta } from "chakra-react-select";
-import { useLazyGetProductsByCategoryQuery, useLazySearchQuery } from "../../../app/api/products";
+import { useLazyGetCategoryProductsQuery, useLazySearchQuery } from "../../../app/api/products";
 import { useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../../util/routes";
@@ -47,7 +47,7 @@ function formatOptionLabel({ label }: SelectConfig, { inputValue }: FormatOption
 export const SearchBar: React.FC = () => {
     const navigate = useNavigate();
     const [search] = useLazySearchQuery();
-    const [getProductsByCategory] = useLazyGetProductsByCategoryQuery();
+    const [getCategoryProducts] = useLazyGetCategoryProductsQuery();
 
     const debouncedSearch = useCallback(
         Utils.debounce((inputValue: string, cb: (config: SelectConfig[]) => void) => {
@@ -96,7 +96,10 @@ export const SearchBar: React.FC = () => {
                     return;
                 }
                 
-                getProductsByCategory(selected.value)
+                getCategoryProducts({
+                    limit: 25,
+                    categoryIds: [selected.value],
+                })
                     .unwrap()
                     .then(console.log);
             }}

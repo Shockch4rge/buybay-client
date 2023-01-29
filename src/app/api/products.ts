@@ -42,7 +42,7 @@ const productsApi = createApi({
     }),
 
     endpoints: builder => ({
-        getProducts: builder.query<Product[], void>({
+        getAllProducts: builder.query<Product[], void>({
             query: () => ({
                 url: "/products",
                 method: "GET",
@@ -125,13 +125,17 @@ const productsApi = createApi({
             },
         }),
 
-        getProductsByCategory: builder.query<Product[], ProductCategory["id"]>({
-            query: categoryId => ({
-                url: `/categories/${categoryId}/products`,
-                method: "GET",
+        getCategoryProducts: builder.query<Product[], { limit?: number; categoryIds: Array<ProductCategory["id"]> }>({
+            query: ({ limit, categoryIds }) => ({
+                url: `/categories/products`,
+                method: "POST",
+                body: {
+                    limit,
+                    categories: categoryIds,
+                },
             }),
     
-            transformResponse: (res: Res<{ products: Product[] }>) =>
+            transformResponse: (res: Res<{ categories: Array<ProductCategory["id"]>; products: Product[] }>) =>
                 Promise.all(res.products.map(p => ProductSchema.parseAsync(p))),
 
             providesTags: cacheUtils.providesList(Tag.Products),
@@ -166,6 +170,7 @@ const productsApi = createApi({
 
 export const {
     useGetUserProductsQuery,
+    useGetAllProductsQuery,
     useGetProductQuery,
     useLazyGetProductQuery,
     useGetAllCategoriesQuery,
@@ -173,7 +178,7 @@ export const {
     useAddProductMutation,
     useUpdateProductMutation,
     useAddProductCategoriesMutation,
-    useLazyGetProductsByCategoryQuery,
+    useLazyGetCategoryProductsQuery,
 } = productsApi;
 
 export default productsApi;
