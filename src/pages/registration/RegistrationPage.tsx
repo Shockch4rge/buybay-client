@@ -195,7 +195,7 @@ export const RegistrationPage: React.FC = () => {
                                             isInvalid={!!errors.confirmPassword && touched.confirmPassword}
                                         >
                                             <FormLabel htmlFor={fields.confirmPassword}>
-                                                Password
+                                                Confirm Password
                                             </FormLabel>
                                             <InputGroup>
                                                 <Input
