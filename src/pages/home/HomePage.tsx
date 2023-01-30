@@ -1,10 +1,9 @@
 import { useGetAllCategoriesQuery, useLazyGetCategoryProductsQuery } from "../../app/api/products";
 import { useNavigate } from "react-router-dom";
-import { useAppDispatch } from "../../app/store/hooks";
+import { useAppDispatch, useAppSelector } from "../../app/store/hooks";
 import {
     AspectRatio,
     Button,
-    ButtonGroup,
     Card,
     CardBody,
     CardFooter,
@@ -27,11 +26,11 @@ import { Footer } from "../common/Footer";
 import { useCallback } from "react";
 import Utils from "../../util/Utils";
 import { AppRoutes } from "../../util/routes";
-import { cartAdd } from "../../app/store/slices/cart";
 
 export const HomePage: React.FC = () => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
+    const cart = useAppSelector(state => state.cart.items);
     const { data: categories } = useGetAllCategoriesQuery({
         limit: 25,
     });
@@ -39,8 +38,8 @@ export const HomePage: React.FC = () => {
     const [getCategoryProducts, { data: products }] = useLazyGetCategoryProductsQuery();
 
     const debounced = useCallback(
-        Utils.debounce((values: string[]) => {
-            getCategoryProducts({ limit: 25, categoryIds: values }).unwrap();
+        Utils.debounce((categoryIds: string[]) => {
+            getCategoryProducts({ limit: 25, categoryIds }).unwrap();
         }, 1000),
         [],
     );
@@ -71,7 +70,7 @@ export const HomePage: React.FC = () => {
                                 <AspectRatio ratio={16/10}>
                                     <Image
                                         // src={product.images.find(i => i.isThumbnail)!.url}
-                                        src={product.images[0].url}
+                                        src={product.images[0]?.url ?? "https://i.scdn.co/image/ab6761610000e5eb45c0f559e90489af64359a59"}
                                         alt='Green double couch with wooden legs'
                                         borderRadius='lg'
                                     />
@@ -90,15 +89,15 @@ export const HomePage: React.FC = () => {
                                 </Stack>
                             </CardBody>
                             <Divider />
-                            <CardFooter display={"flex"} justifyContent={"end"}>
-                                <ButtonGroup spacing='2'>
-                                    <Button size={"sm"} variant={"primaryGhost"} onClick={() => navigate(AppRoutes.Product(product.id))}>
+                            <CardFooter display={"flex"} justifyContent={"space-between"}>
+                                {cart.find(p => p.id === product.id) &&
+                                    <Button variant={"link"} onClick={() => navigate(AppRoutes.Cart)}>
+                                        {cart.filter(p => p.id === product.id).length} in cart
+                                    </Button>
+                                }
+                                <Button size={"sm"} variant={"primaryGhost"} onClick={() => navigate(AppRoutes.Product(product.id))}>
                                         View Details
-                                    </Button>
-                                    <Button size={"sm"} variant={"primary"} onClick={() => dispatch(cartAdd(product))}>
-                                        Add to cart
-                                    </Button>
-                                </ButtonGroup>
+                                </Button>
                             </CardFooter>
                         </Card>
                     </GridItem>,
