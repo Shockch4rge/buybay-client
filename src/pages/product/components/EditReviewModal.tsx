@@ -223,7 +223,6 @@ export const EditReviewModal: React.FC<Props> = ({ review }) => {
                                                 </PopoverFooter>
                                             </PopoverContent>
                                         </>
-
                                         }
                                     </Popover>
                                     <Button
