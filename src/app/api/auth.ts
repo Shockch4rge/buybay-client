@@ -2,6 +2,8 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 import { User, UserSchema } from "../../util/models/User";
 import { RootState } from "../store";
 import { z } from "zod";
+import cacheUtils from "../../util/cacheUtils";
+import { Res } from "./index";
 
 const AuthorizedResSchema = z.object({
     user: UserSchema,
@@ -18,8 +20,14 @@ const UserResSchema = z.object({
 
 type UserRes = z.infer<typeof UserResSchema>;
 
+const Tag = {
+    User: "User",
+};
+
 const authApi = createApi({
     reducerPath: "auth",
+
+    tagTypes: [...cacheUtils.defaultTags, Tag.User],
 
     baseQuery: fetchBaseQuery({
         baseUrl: import.meta.env.VITE_USERS_API,
@@ -42,6 +50,8 @@ const authApi = createApi({
             }),
 
             transformResponse: async (res: AuthorizedRes) => UserSchema.parseAsync(res.user),
+
+            providesTags: cacheUtils.cacheByIdArg(Tag.User),
         }),
 
         getCurrentUser: builder.query<UserRes, void>({
@@ -50,7 +60,7 @@ const authApi = createApi({
                 method: "GET",
             }),
 
-            transformResponse: (res: UserRes) => UserResSchema.parseAsync(res),
+            // transformResponse: (res: UserRes) => UserResSchema.parseAsync(res),
         }),
 
         loginUser: builder.mutation<AuthorizedRes, Pick<User, "email"> & { password: string }>({
@@ -78,16 +88,20 @@ const authApi = createApi({
             }),
 
             transformResponse: (res: AuthorizedRes) => AuthorizedResSchema.parseAsync(res),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.User),
         }),
 
         updateUser: builder.mutation<User, Pick<User, "id"> & { form: FormData }>({
             query: ({ id, form }) => ({
-                url: `/auth/update/${id}`,
-                method: "PUT",
+                url: `/users/${id}?_method=PUT`,
+                method: "POST",
                 body: form,
             }),
 
-            transformResponse: (res: UserRes) => UserSchema.parseAsync(res),
+            transformResponse: (res: Res<{ user: User }>) => UserSchema.parseAsync(res.user),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.User),
         }),
 
         resetPassword: builder.mutation<void, { oldPassword: string; newPassword: string }>({
@@ -104,6 +118,8 @@ const authApi = createApi({
                 method: "DELETE",
                 body,
             }),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tag.User),
         }),
     }),
 });
