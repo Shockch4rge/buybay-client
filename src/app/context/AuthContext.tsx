@@ -133,6 +133,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
         async (params: MutationParams<typeof useUpdateUserMutation>) => {
             try {
                 await update(params).unwrap();
+                navigate(AppRoutes.Home);
                 toast({
                     status: "success",
                     description: "Updated account details!",
