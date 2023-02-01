@@ -21,7 +21,6 @@ import {
     ModalFooter,
     ModalHeader,
     ModalOverlay,
-    Spinner,
     Text,
     Tooltip,
     VStack,
@@ -121,13 +120,13 @@ export const DeleteAccountModal: React.FC = () => {
                                     w="full"
                                     type="submit"
                                     colorScheme={"red"}
-                                    disabled={
+                                    isLoading={
                                         isSubmitting ||
                                         !isValid ||
                                         !touched.password
                                     }
                                 >
-                                    {isSubmitting ? <Spinner /> : "Delete"}
+                                    Delete
                                 </Button>
                             </Form>
                         </ModalBody>

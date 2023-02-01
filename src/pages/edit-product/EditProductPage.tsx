@@ -69,7 +69,7 @@ export const EditProductPage: React.FC = () => {
         <Container minH={"max"} maxW={"5xl"}>
             <BackButton />
             <Heading my={"12"} size={"lg"}>
-                List a product on buybay
+                Edit your product listing
             </Heading>
             <Formik
                 validationSchema={Schema}
