@@ -11,6 +11,7 @@ const uiReducer = combineReducers({
     [modalSlice.name]: modalSlice.reducer,
 });
 
+
 const store = configureStore({
     reducer: {
         [authApi.reducerPath]: authApi.reducer,
