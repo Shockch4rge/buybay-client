@@ -29,6 +29,9 @@ const authSlice = createSlice({
                 state.token = localStorage.getItem("token")!;
                 state.user = payload.user;
             })
+            .addMatcher(authService.endpoints.updateUser.matchFulfilled, (state, { payload }) => {
+                state.user = payload;
+            })
             .addMatcher(
                 authService.endpoints.getCurrentUser.matchFulfilled,
                 (state, { payload }) => {

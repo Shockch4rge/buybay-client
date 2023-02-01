@@ -26,7 +26,7 @@ const fields = {
 };
 
 export const ProfileTab: React.FC = () => {
-    const { user, updateUser } = useAuth();
+    const { user, updateUser, logoutUser } = useAuth();
     const [avatar, setAvatar] = useState<File | null>(null);
     const fileButtonStyles = useMultiStyleConfig("Button", { variant: "secondary", size: "sm" });
     const dispatch = useAppDispatch();
@@ -42,22 +42,9 @@ export const ProfileTab: React.FC = () => {
                 email: user.email,
                 avatar: "",
             }}
-            onSubmit={async values => {
-                const formData = new FormData();
-                formData.append(fields.name, values.name);
-                formData.append(fields.email, values.email);
-
-                if (avatar) {
-                    formData.append(fields.avatar, avatar);
-                }
-
-                await updateUser({
-                    id: user.id,
-                    form: formData,
-                });
-            }}
+            onSubmit={() => {}}
         >
-            {({ errors, touched, isSubmitting, isValid, dirty, getFieldProps }) =>
+            {({ errors, touched, isSubmitting, isValid, dirty, getFieldProps, values }) =>
                 <>
                     <Form>
                         <VStack mt="4" spacing="6">
@@ -130,23 +117,52 @@ export const ProfileTab: React.FC = () => {
                             </Field>
                         </VStack>
                     </Form>
+                    <ButtonGroup mt={"12"} alignSelf={"end"}>
+                        <Button
+                            size={"sm"}
+                            variant={"primary"}
+                            leftIcon={<FaCheck />}
+                            type={"submit"}
+                            onClick={async () => {
+                                const formData = new FormData();
+                                formData.append(fields.name, values.name);
+                                formData.append(fields.email, values.email);
+
+                                if (avatar) {
+                                    formData.append(fields.avatar, avatar);
+                                }
+
+                                await updateUser({
+                                    id: user.id,
+                                    form: formData,
+                                });
+                            }}>
+                            Save Changes
+                        </Button>
+                        <Button size={"sm"} variant={"ghost"} leftIcon={<FaSignOutAlt />} onClick={() => logoutUser()}>
+                            Log out
+                        </Button>
+                        <Button
+                            size={"sm"}
+                            variant={"secondaryGhost"}
+                            leftIcon={<FaRedo />}
+                            onClick={() => dispatch(openModal("resetPassword"))}
+                        >
+                            Reset Password
+                        </Button>
+                        <Button
+                            size={"sm"}
+                            colorScheme={"red"}
+                            variant={"ghost"}
+                            leftIcon={<FaTrash />}
+                            onClick={() => dispatch(openModal("deleteAccount"))}
+                        >
+                            Delete Account
+                        </Button>
+                    </ButtonGroup>
                 </>
             }
         </Formik>
-        <ButtonGroup mt={"12"} alignSelf={"end"}>
-            <Button size={"sm"} variant={"primary"} leftIcon={<FaCheck />}>
-                Save Changes
-            </Button>
-            <Button size={"sm"} variant={"ghost"} leftIcon={<FaSignOutAlt />} onClick={() => {}}>
-                Log out
-            </Button>
-            <Button size={"sm"} variant={"secondaryGhost"} leftIcon={<FaRedo />} onClick={() => dispatch(openModal("resetPassword"))}>
-                Reset Password
-            </Button>
-            <Button size={"sm"} colorScheme={"red"} variant={"ghost"} leftIcon={<FaTrash />}>
-                Delete Account
-            </Button>
-        </ButtonGroup>
     </TabPanel>;
 };
 
