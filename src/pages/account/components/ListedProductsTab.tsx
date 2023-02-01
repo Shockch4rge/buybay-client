@@ -14,17 +14,25 @@ import {
     Text,
     VStack,
 } from "@chakra-ui/react";
-import { useGetUserProductsQuery } from "../../../app/api/products";
+import { useLazyGetUserProductsQuery } from "../../../app/api/products";
 import { useAuth } from "../../../app/context/AuthContext";
 import { Product } from "../../../util/models/Product";
 import { AppRoutes } from "../../../util/routes";
 import { useNavigate } from "react-router-dom";
 import { EmptyContent } from "../../common/EmptyContent";
+import { useEffect } from "react";
 
 
 export const ListedProductsTab: React.FC = () => {
     const { user } = useAuth();
-    const { data: products, isLoading } = useGetUserProductsQuery(user!.id);
+    const [getUserProducts, { data: products }] = useLazyGetUserProductsQuery();
+
+    useEffect(() => {
+        if (!user) return;
+
+        getUserProducts(user.id).unwrap()
+            .then();
+    }, [user]);
 
     return <TabPanel>
         <Heading size={"md"} mb={"8"}>Your Listed Products</Heading>
