@@ -1,0 +1,17 @@
+{
+  "plugins": [
+    "cypress"
+  ],
+  "extends": [
+    "eslint:recommended",
+    "plugin:cypress/recommended"
+  ],
+  "overrides": [],
+  "parser": "@typescript-eslint/parser",
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "project": [
+      "../tsconfig.json"
+    ]
+  }
+}

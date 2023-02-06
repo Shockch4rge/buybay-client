@@ -24,3 +24,7 @@ ReactDOM.createRoot(document.getElementById("root") as HTMLElement).render(
         </Provider>
     </ChakraProvider>,
 );
+
+if (window.Cypress) {
+    window.store = store;
+}
