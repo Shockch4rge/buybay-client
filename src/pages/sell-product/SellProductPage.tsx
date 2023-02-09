@@ -175,6 +175,8 @@ export const SellProductPage: React.FC = () => {
                                                 <Heading size={"md"}>Quantity</Heading>
                                             </FormLabel>
                                             <NumberInput
+                                                {...getFieldProps(fields.quantity)}
+                                                id={fields.quantity}
                                                 defaultValue={1}
                                                 min={1}
                                                 onChange={(_, value) => setFieldValue(fields.quantity, value)}
