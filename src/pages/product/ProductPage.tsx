@@ -73,12 +73,11 @@ export const ProductPage: React.FC = () => {
             default:
                 return reviews;
         }
-    }, [reviews]);
+    }, [reviews, sorting]);
 
     if (!product || !reviews) return <></>;
 
     const isOwnProduct = user?.id === product.sellerId;
-    const hasWrittenReview = reviews.some(r => r.authorId === user?.id);
     const ownReview = reviews.find(r => r.authorId === user?.id);
 
     return (
@@ -155,30 +154,6 @@ export const ProductPage: React.FC = () => {
                                             Quantity:
                                         </Text>
                                     </Hide>
-                                    {/*<HStack spacing={"4"}>*/}
-                                    {/*    <IconButton*/}
-                                    {/*        variant={"ghost"}*/}
-                                    {/*        aria-label={"Decrease Quantity"}*/}
-                                    {/*        icon={<FaMinus/>}*/}
-                                    {/*        disabled={cartQuantity <= 1}*/}
-                                    {/*        onClick={() => setCartQuantity(q => q - 1)}*/}
-                                    {/*    />*/}
-                                    {/*    <Editable*/}
-                                    {/*        defaultValue={cartQuantity}*/}
-                                    {/*        textAlign={"center"}*/}
-                                    {/*    >*/}
-                                    {/*        <EditablePreview />*/}
-
-                                    {/*    </Editable>*/}
-                                    {/*    <Heading size={"md"}>{cartQuantity}</Heading>*/}
-                                    {/*    <IconButton*/}
-                                    {/*        variant={"ghost"}*/}
-                                    {/*        aria-label={"Increase Quantity"}*/}
-                                    {/*        icon={<FaPlus/>}*/}
-                                    {/*        disabled={cartQuantity >= product.quantity}*/}
-                                    {/*        onClick={() => setCartQuantity(q => q + 1)}*/}
-                                    {/*    />*/}
-                                    {/*</HStack>*/}
                                     <MobileQuantityButton product={product} />
                                 </Stack>
                                 : 
@@ -200,23 +175,20 @@ export const ProductPage: React.FC = () => {
 
                 <VStack align={"start"} spacing={"8"}>
                     <Heading mt={"24"}>Reviews ({reviews.length})</Heading>
-                    {/* TODO: add back disabled flag */}
-                    {/*<Button onClick={() => dispatch(openModal("createReview"))} disabled={isOwnProduct || hasWrittenReview}>*/}
-                    {/*    {isOwnProduct*/}
-                    {/*        ? "You can't write a review for your own product."*/}
-                    {/*        : hasWrittenReview*/}
-                    {/*            ? "You've already reviewed this product."*/}
-                    {/*            : "Write a review"}*/}
-                    {/*</Button>*/}
-                    {ownReview && 
+                    {ownReview &&
                         <VStack w={"full"} my={"20"} align={"start"} spacing={"8"}>
                             <Heading size={"md"}>Your Review</Heading>
                             <SessionUserReviewCard review={ownReview} />
                         </VStack>
                     }
-                    {!ownReview ? 
-                        <Button onClick={() => dispatch(openModal("createReview"))}>
-                            Write a review
+                    {!ownReview ?
+                        <Button onClick={() => dispatch(openModal("createReview"))} disabled={isOwnProduct || !!ownReview}>
+                            {isOwnProduct
+                                ? "You can't write a review for your own product."
+                                : ownReview
+                                    ? "You've already reviewed this product."
+                                    : "Write a review"
+                            }
                         </Button>
                         : 
                         <Divider w={"full"} />
@@ -275,9 +247,9 @@ const MobileQuantityButton: React.FC<{ product: Product }> = ({ product }) => {
     return (
         <>
             <HStack w={"52"}>
-                <Button {...getIncrementButtonProps()}>+</Button>
+                <Button {...getIncrementButtonProps()} id={"increment-quantity-btn"}>+</Button>
                 <Input {...getInputProps()} />
-                <Button {...getDecrementButtonProps()}>-</Button>
+                <Button {...getDecrementButtonProps()} id={"decrement-quantity-btn"}>-</Button>
             </HStack>
             {product.quantity > 0 ? 
                 <Button
