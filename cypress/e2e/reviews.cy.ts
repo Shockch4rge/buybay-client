@@ -6,9 +6,11 @@ describe("product reviews", () => {
         });
     });
 
-    it("user can create, edit, and delete a product review", () => {
+    beforeEach(() => {
         cy.login();
+    });
 
+    it("user can create, edit, and delete a product review", () => {
         cy.intercept({
             method: "POST",
             url: `/api/product-reviews`,
