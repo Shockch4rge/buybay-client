@@ -123,6 +123,11 @@ const productsApi = createApi({
                     categories: await Promise.all(categories.map(c => ProductCategorySchema.parseAsync(c))),
                 };
             },
+
+            providesTags: (result, error) => [
+                ...cacheUtils.providesList(Tag.Products)(result?.products, error),
+                ...cacheUtils.providesList(Tag.Categories)(result?.categories, error),
+            ],
         }),
 
         getCategoryProducts: builder.query<Product[], { limit?: number; categoryIds: Array<ProductCategory["id"]> }>({
@@ -169,8 +174,8 @@ const productsApi = createApi({
 });
 
 export const {
+    useLazyGetUserProductsQuery,
     useGetUserProductsQuery,
-    useGetAllProductsQuery,
     useGetProductQuery,
     useLazyGetProductQuery,
     useGetAllCategoriesQuery,
