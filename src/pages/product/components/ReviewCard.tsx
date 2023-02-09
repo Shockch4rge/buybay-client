@@ -18,6 +18,7 @@ import { useAuth } from "../../../app/context/AuthContext";
 import { FaPen } from "react-icons/all";
 import { useAppDispatch } from "../../../app/store/hooks";
 import { openModal } from "../../../app/store/slices/ui/modals";
+import { Rating } from "../../common/Rating";
 
 interface Props {
     review: ProductReview;
@@ -37,13 +38,7 @@ export const ReviewCard: React.FC<Props> = ({ review }) => {
                 <VStack align={"start"}>
                     <Heading size={"sm"}>{user.name}</Heading>
                     <HStack spacing={"4"}>
-                        <HStack>
-                            {Array.from({ length: 5 }, (_, i) => i + 1).map((_, i) =>
-                                <Text key={i} color={i < review.rating ? "green.300" : "gray.400"}>
-                                    <FaStar/>
-                                </Text>,
-                            )}
-                        </HStack>
+                        <Rating rating={review.rating} />
                         <Heading size={"md"}>{review.title}</Heading>
                     </HStack>
                 </VStack>
