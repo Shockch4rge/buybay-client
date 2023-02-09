@@ -1,9 +1,11 @@
 export const AppRoutes = {
     Home: "/",
     Cart: "/cart",
-    Product: (id: string) => `/product/${id}`,
+    Product: (id = ":id") => `/product/${id}`,
     SellProduct: "/sell-product",
-    EditProduct: (id: string) => `/edit-product/${id}`,
+    EditProduct: (id = ":id") => `/edit-product/${id}`,
     Registration: "/register",
     Account: "/account",
+    Order: (id = ":id") => `/order/${id}`,
+    Checkout: (path: "" | "cancelled" | "success") => `/checkout/${path}`,
 } as const;
