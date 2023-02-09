@@ -1,19 +1,16 @@
 import { z } from "zod";
+import { ProductSchema } from "./Product";
 
 export const OrderSchema = z.object({
     id: z.string(),
-    product_id: z.string(),
-    seller_id: z.string(),
-    buyer_id: z.string(),
+    customer_id: z.string(),
     created_at: z.string(),
-    product_quantity: z.number(),
+    products: z.array(ProductSchema),
 }).transform(raw => ({
     id: raw.id,
-    productId: raw.product_id,
-    sellerId: raw.seller_id,
-    buyerId: raw.buyer_id,
+    customerId: raw.customer_id,
     createdAt: raw.created_at,
-    productQuantity: raw.product_quantity,
+    products: raw.products,
 }));
 
 export type Order = z.infer<typeof OrderSchema>;
