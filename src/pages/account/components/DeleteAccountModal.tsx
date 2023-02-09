@@ -66,7 +66,7 @@ export const DeleteAccountModal: React.FC = () => {
                             <Text mt={"4"}>
                                 This action is irreversible. Enter your password to confirm.
                             </Text>
-                            <Form>
+                            <Form name={"deleteAccount"}>
                                 <VStack mt="10" spacing="6" justify="center">
                                     <Field name={passwordFieldName}>
                                         {(props: any) =>
@@ -120,11 +120,8 @@ export const DeleteAccountModal: React.FC = () => {
                                     w="full"
                                     type="submit"
                                     colorScheme={"red"}
-                                    isLoading={
-                                        isSubmitting ||
-                                        !isValid ||
-                                        !touched.password
-                                    }
+                                    isDisabled={!isValid || !touched.password}
+                                    isLoading={isSubmitting}
                                 >
                                     Delete
                                 </Button>

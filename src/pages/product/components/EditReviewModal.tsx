@@ -32,7 +32,6 @@ import {
     SliderThumb,
     SliderTrack,
     Spinner,
-    Text,
     Textarea,
     useToast,
     VStack,
@@ -102,7 +101,7 @@ export const EditReviewModal: React.FC<Props> = ({ review }) => {
                             <Heading size="lg">
                                 Edit your review
                             </Heading>
-                            <Form>
+                            <Form name={"editReview"}>
                                 <VStack mt="10" spacing="6" align={"start"}>
                                     <Field name={fields.title}>
                                         {(props: any) =>
@@ -144,10 +143,12 @@ export const EditReviewModal: React.FC<Props> = ({ review }) => {
                                         }
                                     </Field>
 
-                                    <Text>Rating</Text>
-                                    <Box w={"full"} px={"2"}>
-                                        <Field name={fields.rating}>
-                                            {(props: any) =>
+                                    <Field name={fields.rating}>
+                                        {(props: any) =>
+                                            <Box w={"full"} px={"2"}>
+                                                <FormLabel htmlFor={fields.rating}>
+                                                    Rating
+                                                </FormLabel>
                                                 <Slider
                                                     {...getFieldProps(fields.rating)}
                                                     defaultValue={1}
@@ -174,14 +175,13 @@ export const EditReviewModal: React.FC<Props> = ({ review }) => {
                                                     <SliderTrack>
                                                         <SliderFilledTrack bg={"green.300"} />
                                                     </SliderTrack>
-                                                    <SliderThumb boxSize={6} textColor={"green.300"}>
+                                                    <SliderThumb className={"review-rating-slider-thumb"} boxSize={6} textColor={"green.300"}>
                                                         <FaStar />
                                                     </SliderThumb>
                                                 </Slider>
-                                            }
-                                        </Field>
-                                    </Box>
-
+                                            </Box>
+                                        }
+                                    </Field>
                                 </VStack>
 
                                 <ModalFooter mt={"12"} mb={"6"} gap={"4"}>
@@ -206,6 +206,7 @@ export const EditReviewModal: React.FC<Props> = ({ review }) => {
                                                 </PopoverBody>
                                                 <PopoverFooter border={"0"}>
                                                     <Button
+                                                        name={"confirmReviewDelete"}
                                                         colorScheme={"red"}
                                                         size={"sm"}
                                                         disabled={isSubmitting || isLoading}

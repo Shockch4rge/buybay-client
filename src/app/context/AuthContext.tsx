@@ -68,7 +68,7 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
                 console.log(e);
                 toast({
                     status: "error",
-                    description: (e as any).data.message,
+                    description: (e as any).message,
                 });
             }
         }, []);

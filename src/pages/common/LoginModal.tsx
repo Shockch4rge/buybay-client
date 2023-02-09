@@ -161,9 +161,7 @@ export const LoginModal: React.FC = () => {
                                     variant="primary"
                                     disabled={
                                         isSubmitting ||
-                                        !isValid ||
-                                        !touched.email ||
-                                        !touched.password
+                                        !isValid
                                     }
                                 >
                                     {isSubmitting ? <Spinner /> : "Login"}

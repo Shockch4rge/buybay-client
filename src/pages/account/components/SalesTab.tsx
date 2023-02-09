@@ -1,25 +1,9 @@
-import {
-    Button,
-    Card,
-    CardBody,
-    Heading,
-    Hide,
-    Image,
-    Skeleton,
-    Stack,
-    Stat,
-    StatNumber,
-    TabPanel,
-    Text,
-    VStack,
-} from "@chakra-ui/react";
+import { Card, CardBody, Heading, Skeleton, Stack, TabPanel, VStack } from "@chakra-ui/react";
 import { useLazyGetUserSalesQuery } from "../../../app/api/orders";
 import { useCallback, useEffect, useState } from "react";
 import { useAuth } from "../../../app/context/AuthContext";
 import { Order } from "../../../util/models/Order";
 import { useNavigate } from "react-router-dom";
-import { useGetProductQuery, useLazyGetProductQuery } from "../../../app/api/products";
-import { AppRoutes } from "../../../util/routes";
 import {
     BarElement,
     CategoryScale,
@@ -32,7 +16,6 @@ import {
     Tooltip,
 } from "chart.js";
 import { Chart } from "react-chartjs-2";
-import { EmptyContent } from "../../common/EmptyContent";
 
 ChartJS.register(LineElement, BarElement, Tooltip, CategoryScale, LinearScale, PointElement, Legend);
 
@@ -70,29 +53,28 @@ export const SalesTab: React.FC = () => {
     const { user } = useAuth();
     const [revenue, setRevenue] = useState<number[]>([]);
     const [getUserSales, { data: sales, isLoading: isLoadingSales }] = useLazyGetUserSalesQuery();
-    const [getProduct] = useLazyGetProductQuery();
 
-    const findTotalSales = useCallback(async (month: number) => {
-        const sales = await getUserSales(user!.id).unwrap();
+    const salesInMonth = useCallback(async (month: number) => {
+        if (!user) return [];
+
+        const sales = await getUserSales(user.id).unwrap();
         return sales.filter(sale => new Date(sale.createdAt).getMonth() === month);
     }, []);
 
-    const findTotalRevenue = useCallback(async (sales: Order[]) => {
-        const products = await Promise.all(sales.map(s => getProduct(s.productId).unwrap()));
-        return sales.reduce((acc, sale, i) => acc + sale.productQuantity * products[i].price, 0);
+    const revenueFromSales = useCallback(async (sales: Order[]) => {
+        return sales.reduce((acc, sale, i) => acc + sale.products.length * sale.products[i].price, 0);
     }, []);
 
     useEffect(() => {
         if (!user) return;
 
         for (const month of months) {
-            findTotalSales(month).then(sales => {
-                findTotalRevenue(sales).then(revenue => {
+            salesInMonth(month).then(sales => {
+                revenueFromSales(sales).then(revenue => {
                     setRevenue(prev => [...prev, revenue]);
                 });
             });
         }
-
     }, [user]);
 
     if (!sales || isLoadingSales) {
@@ -133,36 +115,21 @@ export const SalesTab: React.FC = () => {
                 },
             ],
         }} />
-        {sales &&
-            (sales.length === 0
-                ?
-                <EmptyContent mt={"8"}>
-                    <Heading size={"sm"}>You haven&apos;t made any sales!</Heading>
-                </EmptyContent>
-                :
-                <VStack spacing={"4"}>
-                    {sales.map(o => <SaleCard key={`order-card-${o.id}`} order={o} />)}
-                </VStack>
-            )
-        }
+        <VStack spacing={"4"}>
+            {sales
+                ? sales.map(o => <SaleCard key={`sale-card-${o.id}`} order={o} />)
+                : <>
+                    <SaleCardSkeleton />
+                    <SaleCardSkeleton />
+                    <SaleCardSkeleton />
+                </>
+            }
+        </VStack>
     </TabPanel>;
 };
 
 const SaleCard: React.FC<{ order: Order }> = ({ order }) => {
     const navigate = useNavigate();
-    const { data: product, isLoading: isLoadingProduct } = useGetProductQuery(order.productId);
-
-    if (!product || isLoadingProduct) {
-        return <Card h={"8em"} direction={"row"} variant={"outline"} bg={"white"} borderRadius={"lg"}>
-            <Skeleton h={"8em"} w={"8em"}/>
-            <CardBody>
-                <Stack mt={"2"} spacing={"4"}>
-                    <Skeleton h={"1em"} w={"12em"}/>
-                    <Skeleton h={"1em"} w={"24em"}/>
-                </Stack>
-            </CardBody>
-        </Card>;
-    }
 
     return <Card
         bg={"white"}
@@ -177,25 +144,20 @@ const SaleCard: React.FC<{ order: Order }> = ({ order }) => {
         }}
         transition={"border 0.2s ease-out"}
     >
-        <Image fit={"cover"} boxSize={"xs"} src={product.images.find(i => i.isThumbnail)!.url} />
-        <CardBody px={"8"} display={"flex"} gap={"8"} justifyContent={"space-between"} alignItems={"center"}>
-            <Stack mt={"2"} spacing={"3"}>
-                <Heading size={{ base: "sm", md: "md" }}>{product.name}</Heading>
-                <Hide below={"lg"}>
-                    <Text>{product.description}</Text>
-                </Hide>
-                <Stat mt={"4"}>
-                    <StatNumber>${product.price.toFixed(2)}</StatNumber>
-                </Stat>
+        <CardBody>
+            Hello
+        </CardBody>
+    </Card>;
+};
+
+const SaleCardSkeleton = () => {
+    return <Card h={"8em"} direction={"row"} variant={"outline"} bg={"white"} borderRadius={"lg"}>
+        <Skeleton h={"8em"} w={"8em"}/>
+        <CardBody>
+            <Stack mt={"2"} spacing={"4"}>
+                <Skeleton h={"1em"} w={"12em"}/>
+                <Skeleton h={"1em"} w={"24em"}/>
             </Stack>
-            <VStack align={"stretch"} spacing={{ md: "4", lg: "8" }}>
-                <Button
-                    size={{ md: "sm", lg: "md" }}
-                    onClick={() => navigate(AppRoutes.Product(product.id))}
-                >
-                    View
-                </Button>
-            </VStack>
         </CardBody>
     </Card>;
 };
