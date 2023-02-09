@@ -4,6 +4,7 @@ import { RootState } from "../store";
 import { Order, OrderSchema } from "../../util/models/Order";
 import { User } from "../../util/models/User";
 import { Res } from "./index";
+import { ProductJSON } from "../../util/models/Product";
 
 const Tags = {
     Orders: "Orders",
@@ -34,6 +35,17 @@ const ordersApi = createApi({
             }),
         }),
 
+        getOrder: builder.query<Order, Order["id"]>({
+            query: id => ({
+                url: `/order/${id}`,
+                method: "GET",
+            }),
+
+            transformResponse: (res: Res<{ order: Order }>) => OrderSchema.parseAsync(res.order),
+
+            providesTags: cacheUtils.cacheByIdArg(Tags.Orders),
+        }),
+
         getUserOrders: builder.query<Order[], User["id"]>({
             query: id => ({
                 url: `/user/${id}/orders`,
@@ -57,12 +69,29 @@ const ordersApi = createApi({
 
             providesTags: cacheUtils.invalidatesList(Tags.Orders),
         }),
+
+        checkout: builder.mutation<{ order: Order; url: string }, { buyer_id: User["id"]; products: Array<ProductJSON & { purchased_quantity: number }> }>({
+            query: body => ({
+                url: "/checkout",
+                method: "POST",
+                body,
+            }),
+
+            transformResponse: async (res: Res<{ order: Order; url: string }>) => ({
+                order: await OrderSchema.parseAsync(res.order),
+                url: res.url,
+            }),
+
+            invalidatesTags: cacheUtils.invalidatesList(Tags.Orders),
+        }),
     }),
 });
 
 export const {
+    useGetOrderQuery,
     useLazyGetUserOrdersQuery,
     useLazyGetUserSalesQuery,
+    useCheckoutMutation,
 } = ordersApi;
 
 export default ordersApi;
