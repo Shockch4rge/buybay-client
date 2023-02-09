@@ -36,7 +36,7 @@
 //   }
 // }
 
-Cypress.Commands.add("login", (email: string, password: string) => {
+Cypress.Commands.add("login", (email = "john@gmail.com", password = "dddddddd") => {
     cy.visit("/");
 
     cy.intercept({
@@ -56,8 +56,16 @@ Cypress.Commands.add("login", (email: string, password: string) => {
 });
 
 Cypress.Commands.add("logout", () => {
-    cy.clearLocalStorage();
-    cy.clearCookies();
+    cy.login("john@gmail.com", "dddddddd");
+    cy.get("button").contains("Account").click();
+    cy.get("button").contains("Log out").click();
+
+    cy.window()
+        .its("store")
+        .invoke("getState")
+        .its("_auth")
+        .its("user")
+        .should("be.null");
 });
 
 export {};
