@@ -26,7 +26,7 @@ import {
     VStack,
 } from "@chakra-ui/react";
 
-import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
+import { useAppDispatch } from "../../../app/store/hooks";
 import { cartAdd, cartClear, cartRemove } from "../../../app/store/slices/cart";
 import { Product } from "../../../util/models/Product";
 import { AppRoutes } from "../../../util/routes";
@@ -34,12 +34,10 @@ import { FaTrash } from "react-icons/all";
 
 interface Props {
     product: Product;
+    quantity: number;
 }
 
-export const ProductCard: React.FC<Props> = ({ product }) => {
-    const cartQuantity = useAppSelector(
-        state => state.cart.items.filter(p => p.id === product.id).length,
-    );
+export const ProductCard: React.FC<Props> = ({ product, quantity}) => {
     const dispatch = useAppDispatch();
     const navigate = useNavigate();
     const toast = useToast();
@@ -90,30 +88,31 @@ export const ProductCard: React.FC<Props> = ({ product }) => {
                     </Button>
                     <HStack spacing={"4"}>
                         <IconButton
+                            className={"decrement-cart-quantity"}
                             variant={"ghost"}
                             aria-label={"Decrease Quantity"}
                             icon={<FaMinus />}
-                            disabled={cartQuantity <= 1}
+                            disabled={quantity <= 1}
                             onClick={() => dispatch(cartRemove(product))}
                         />
-                        <Heading size={"md"}>{cartQuantity}</Heading>
+                        <Heading size={"md"}>{quantity}</Heading>
                         <IconButton
                             variant={"ghost"}
                             aria-label={"Increase Quantity"}
                             icon={<FaPlus />}
-                            disabled={cartQuantity >= product.quantity}
+                            disabled={quantity >= product.quantity}
                             onClick={() => dispatch(cartAdd({
                                 product,
                                 quantity: 1,
                             }))}
                         />
-                        <Text fontSize={"lg"}>${(product.price * cartQuantity).toFixed(2)}</Text>
+                        <Text fontSize={"lg"}>${(product.price * quantity).toFixed(2)}</Text>
                     </HStack>
                 </VStack>
                 <Popover>
                     {({ onClose }) => <>
                         <PopoverTrigger>
-                            <IconButton aria-label={"Remove Product"} pos={"absolute"} top={"4"} right={"4"}>
+                            <IconButton className={"remove-from-cart"} aria-label={"Remove Product"} pos={"absolute"} top={"4"} right={"4"}>
                                 <FaTrash />
                             </IconButton>
                         </PopoverTrigger>
