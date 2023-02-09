@@ -23,7 +23,7 @@ import {
 import { Footer } from "../common/Footer";
 import { chakraComponents } from "chakra-react-select";
 import { useAddProductMutation } from "../../app/api/products";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import * as Yup from "yup";
 import { useAuth } from "../../app/context/AuthContext";
 import { Field, Form, Formik } from "formik";
@@ -62,6 +62,8 @@ export const SellProductPage: React.FC = () => {
     const [categories, setCategories] = useState<string[]>([]);
     const [addProduct, { isLoading: isAddingProduct }] = useAddProductMutation();
     const fileButtonStyles = useMultiStyleConfig("Button", { variant: "secondary", size: "sm" });
+
+    const productImageInputRef = useRef<HTMLInputElement | null>(null);
 
     return <>
         <NavBar />
@@ -195,15 +197,10 @@ export const SellProductPage: React.FC = () => {
                                     {() =>
                                         <FormControl>
                                             <FormLabel htmlFor={"image-input"}>
-                                                <VStack spacing={"1"} alignItems={"start"}>
-                                                    <Heading size={"md"}>Images (max 6)</Heading>
-                                                    <Text>
-                                                        *Images must be in .jpg, .jpeg, or .png format.
-                                                    </Text>
-                                                    <Text>
-                                                        *First image uploaded will be the product thumbnail.
-                                                    </Text>
-                                                </VStack>
+                                                <Heading mb={"2"} size={"md"}>Images (max 6)</Heading>
+                                                <Text>
+                                                    *Images must be in .jpg or .png format. The first image uploaded will be the product&apos;s thumbnail.
+                                                </Text>
                                             </FormLabel>
                                             <SimpleGrid mb={"6"} columns={4} spacing={"10"} id={"image-input"}>
                                                 {images.map(image =>
@@ -223,22 +220,15 @@ export const SellProductPage: React.FC = () => {
                                             <Input
                                                 {...getFieldProps(fields.images)}
                                                 id={fields.images}
+                                                ref={productImageInputRef}
                                                 type={"file"}
                                                 multiple
-                                                border={"none"}
-                                                placeholder="e.g. John Doe"
-                                                sx={{
-                                                    "::file-selector-button": {
-                                                        border: "none",
-                                                        outline: "none",
-                                                        ml: -4,
-                                                        mr: 8,
-                                                        cursor: "pointer",
-                                                        ...fileButtonStyles,
-                                                    },
-                                                }}
+                                                hidden
                                                 onChange={e => setImages(Array.from(e.target.files ?? []))}
                                             />
+                                            <Button onClick={() => productImageInputRef.current?.click()}>
+                                                Attach images
+                                            </Button>
                                         </FormControl>
                                     }
                                 </Field>
