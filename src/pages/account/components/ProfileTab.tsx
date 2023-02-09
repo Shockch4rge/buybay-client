@@ -14,10 +14,11 @@ import {
 import { useAuth } from "../../../app/context/AuthContext";
 import { Field, Form, Formik } from "formik";
 import * as Yup from "yup";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { FaCheck, FaRedo, FaSignOutAlt, FaTrash } from "react-icons/all";
 import { openModal } from "../../../app/store/slices/ui/modals";
 import { useAppDispatch } from "../../../app/store/hooks";
+import Utils from "../../../util/Utils";
 
 const fields = {
     name: "name",
@@ -30,6 +31,7 @@ export const ProfileTab: React.FC = () => {
     const [avatar, setAvatar] = useState<File | null>(null);
     const fileButtonStyles = useMultiStyleConfig("Button", { variant: "secondary", size: "sm" });
     const dispatch = useAppDispatch();
+    const avatarInputRef = useRef<HTMLInputElement | null>(null);
 
     if (!user) return <></>;
 
@@ -42,11 +44,25 @@ export const ProfileTab: React.FC = () => {
                 email: user.email,
                 avatar: "",
             }}
-            onSubmit={() => {}}
+            onSubmit={async ({ name, email }) => {
+                const formData = new FormData();
+
+                formData.append("name", name);
+                formData.append("email", email);
+
+                if (avatar) {
+                    formData.append("avatar", avatar);
+                }
+
+                await updateUser({
+                    id: user.id,
+                    form: formData,
+                });
+            }}
         >
             {({ errors, touched, isSubmitting, isValid, dirty, getFieldProps, values }) =>
                 <>
-                    <Form>
+                    <Form name={"updateUser"}>
                         <VStack mt="4" spacing="6">
                             <Avatar
                                 alignSelf={"start"}
@@ -60,25 +76,19 @@ export const ProfileTab: React.FC = () => {
                                         <Input
                                             {...getFieldProps(fields.avatar)}
                                             id={fields.avatar}
+                                            ref={avatarInputRef}
                                             type={"file"}
+                                            accept={"image/**"}
                                             border={"none"}
-                                            sx={{
-                                                "::file-selector-button": {
-                                                    border: "none",
-                                                    outline: "none",
-                                                    ml: -4,
-                                                    mr: 8,
-                                                    cursor: "pointer",
-                                                    ...fileButtonStyles,
-                                                },
-                                            }}
-                                            onChange={e => {
+                                            hidden
+                                            onChange={async e => {
                                                 const file = e.target.files?.item(0);
                                                 if (file) {
-                                                    setAvatar(file);
+                                                    setAvatar(await Utils.compress(file));
                                                 }
                                             }}
                                         />
+                                        <Button onClick={() => avatarInputRef.current?.click()}>Choose avatar</Button>
                                         <FormErrorMessage>{errors.avatar}</FormErrorMessage>
                                     </FormControl>
                                 }

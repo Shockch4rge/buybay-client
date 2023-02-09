@@ -1,11 +1,18 @@
 import { NavBar } from "../common/NavBar";
 import {
+    AlertDialog,
+    AlertDialogBody,
+    AlertDialogContent,
+    AlertDialogFooter,
+    AlertDialogHeader,
+    AlertDialogOverlay,
     Button,
     Container,
     FormControl,
     FormErrorMessage,
     FormLabel,
     Heading,
+    HStack,
     Image,
     Input,
     NumberDecrementStepper,
@@ -17,18 +24,22 @@ import {
     Spinner,
     Text,
     Textarea,
-    useMultiStyleConfig,
+    useDisclosure,
+    useToast,
     VStack,
 } from "@chakra-ui/react";
 import { Footer } from "../common/Footer";
 import { chakraComponents } from "chakra-react-select";
-import { useGetProductQuery, useUpdateProductMutation } from "../../app/api/products";
-import { useState } from "react";
+import { useDeleteProductMutation, useGetProductQuery, useUpdateProductMutation } from "../../app/api/products";
+import { useRef, useState } from "react";
 import * as Yup from "yup";
 import { Field, Form, Formik } from "formik";
 import { CategorySelect } from "./components/CategorySelect";
 import { BackButton } from "../common/BackButton";
 import { useNavigate, useParams } from "react-router-dom";
+import Utils from "../../util/Utils";
+import { FaTrash } from "react-icons/all";
+import { AppRoutes } from "../../util/routes";
 
 const fields = {
     name: "name",
@@ -55,12 +66,13 @@ const parse = (val: string) => val.replace(/^\$/, "");
 
 export const EditProductPage: React.FC = () => {
     const navigate = useNavigate();
+    const toast = useToast();
     const { id } = useParams();
+    const productImageInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const { data: product } = useGetProductQuery(id!);
     const [updateProduct] = useUpdateProductMutation();
-    const fileButtonStyles = useMultiStyleConfig("Button", { variant: "secondary", size: "sm" });
 
     if (!product) return <></>;
 
@@ -96,13 +108,10 @@ export const EditProductPage: React.FC = () => {
                         formData.append(`${fields.categories}[]`, category);
                     }
 
-                    console.log(Array.from(formData.values()));
-
                     const product = await updateProduct({
                         id: id!,
                         data: formData,
                     }).unwrap();
-                    // navigate(AppRoutes.Product(product.id));
                 }}
             >
                 {({
@@ -114,7 +123,7 @@ export const EditProductPage: React.FC = () => {
                     isValid,
                 }) =>
                     <>
-                        <Form>
+                        <Form name={"updateProduct"}>
                             <VStack w={"full"} mt="4" spacing="6">
                                 <Field name={fields.name}>
                                     {(props: any) =>
@@ -124,7 +133,7 @@ export const EditProductPage: React.FC = () => {
                                             </FormLabel>
                                             <Input
                                                 {...getFieldProps(fields.name)}
-                                                id={fields.name}
+                                                id={`edit-product-${fields.name}`}
                                                 placeholder="Product Name"
                                             />
                                             <FormErrorMessage>{errors.name}</FormErrorMessage>
@@ -141,7 +150,7 @@ export const EditProductPage: React.FC = () => {
                                             </FormLabel>
                                             <Textarea
                                                 {...getFieldProps(fields.description)}
-                                                id={fields.description}
+                                                id={`edit-product-${fields.description}`}
                                                 placeholder="Product Description"
                                             />
                                             <FormErrorMessage>{errors.description}</FormErrorMessage>
@@ -157,7 +166,7 @@ export const EditProductPage: React.FC = () => {
                                             </FormLabel>
                                             <NumberInput
                                                 {...getFieldProps(fields.price)}
-                                                id={fields.price}
+                                                id={`edit-product-${fields.price}`}
                                                 min={0.01}
                                                 precision={2}
                                                 step={0.5}
@@ -180,6 +189,8 @@ export const EditProductPage: React.FC = () => {
                                                 <Heading size={"md"}>Quantity</Heading>
                                             </FormLabel>
                                             <NumberInput
+                                                {...getFieldProps(fields.quantity)}
+                                                id={`edit-product-${fields.quantity}`}
                                                 min={1}
                                                 defaultValue={getFieldProps(fields.quantity).value}
                                                 onChange={(_, value) => setFieldValue(fields.quantity, value)}
@@ -198,17 +209,21 @@ export const EditProductPage: React.FC = () => {
                                     {() =>
                                         <FormControl>
                                             <FormLabel htmlFor={"image-input"}>
-                                                <VStack spacing={"1"} alignItems={"start"}>
-                                                    <Heading size={"md"}>Images (max 6)</Heading>
-                                                    <Text>
-                                                        *Images must be in .jpg, .jpeg, or .png format.
-                                                    </Text>
-                                                    <Text>
-                                                        *First image uploaded will be the product thumbnail.
-                                                    </Text>
-                                                </VStack>
+                                                <Heading mb={"2"} size={"md"}>Images (max 6)</Heading>
+                                                <Text>
+                                                    *Images must be in .jpg or .png format. The first image uploaded will be the product&apos;s thumbnail.
+                                                </Text>
                                             </FormLabel>
-                                            <SimpleGrid mb={"6"} columns={4} spacing={"10"} id={"image-input"}>
+                                            <SimpleGrid
+                                                mb={"6"}
+                                                p={"5"}
+                                                borderColor={"gray.200"}
+                                                borderWidth={"thin"}
+                                                borderRadius={"6"}
+                                                columns={4}
+                                                spacing={"10"}
+                                                id={"image-input"}
+                                            >
                                                 {images.length > 0
                                                     ? images.map(image =>
                                                         <Image
@@ -235,37 +250,48 @@ export const EditProductPage: React.FC = () => {
                                             </Heading>}
                                             <Input
                                                 {...getFieldProps(fields.images)}
-                                                id={fields.images}
+                                                id={`edit-product-${fields.images}`}
+                                                ref={productImageInputRef}
                                                 type={"file"}
+                                                accept={"image/**"}
                                                 multiple
-                                                border={"none"}
-                                                placeholder="e.g. John Doe"
-                                                sx={{
-                                                    "::file-selector-button": {
-                                                        border: "none",
-                                                        outline: "none",
-                                                        ml: -4,
-                                                        mr: 8,
-                                                        cursor: "pointer",
-                                                        ...fileButtonStyles,
-                                                    },
+                                                hidden
+                                                onChange={async e => {
+                                                    try {
+                                                        const images = await Promise.all(
+                                                            Array.from(e.target.files ?? [])
+                                                                .map(f => Utils.compress(f)),
+                                                        );
+                                                        setImages(images);
+                                                    }
+                                                    catch (e) {
+                                                        toast({
+                                                            title: "Invalid file type. Please upload a .jpeg or .png image.",
+                                                            status: "error",
+                                                        });
+                                                    }
                                                 }}
-                                                onChange={e => setImages(Array.from(e.target.files ?? []))}
                                             />
+                                            <Button onClick={() => productImageInputRef.current?.click()}>
+                                                Attach images
+                                            </Button>
                                         </FormControl>
                                     }
                                 </Field>
-                                <Button
-                                    type="submit"
-                                    variant="primary"
-                                    alignSelf={"end"}
-                                    disabled={
-                                        isSubmitting ||
+                                <HStack alignSelf={"end"} spacing={"4"}>
+                                    <DeleteProductDialog id={product.id} disabled={isSubmitting}/>
+                                    <Button
+                                        type="submit"
+                                        variant="primary"
+                                        alignSelf={"end"}
+                                        disabled={
+                                            isSubmitting ||
                                         !isValid
-                                    }
-                                >
-                                    {isSubmitting ? <Spinner /> : "List Product"}
-                                </Button>
+                                        }
+                                    >
+                                        {isSubmitting ? <Spinner /> : "Save Changes"}
+                                    </Button>
+                                </HStack>
                             </VStack>
                         </Form>
                     </>
@@ -273,6 +299,63 @@ export const EditProductPage: React.FC = () => {
             </Formik>
         </Container>
         <Footer />
+    </>;
+};
+
+const DeleteProductDialog: React.FC<{ id: string; disabled?: boolean }> = ({ id, disabled = false }) => {
+    const navigate = useNavigate();
+    const { isOpen, onClose, onOpen } = useDisclosure();
+    const cancelRef = useRef<HTMLButtonElement | null>(null);
+    const [deleteProduct, { isLoading: isDeleting }] = useDeleteProductMutation();
+
+    return <>
+        <Button
+            leftIcon={<FaTrash />}
+            variant={"ghost"}
+            disabled={disabled || isDeleting}
+            onClick={onOpen}
+        >
+            Delete Product
+        </Button>
+
+        <AlertDialog
+            isOpen={isOpen}
+            motionPreset={"slideInBottom"}
+            leastDestructiveRef={cancelRef}
+            onClose={onClose}
+            isCentered
+        >
+            <AlertDialogOverlay>
+                <AlertDialogContent>
+                    <AlertDialogHeader fontSize='lg' fontWeight='bold'>
+                        Delete Product
+                    </AlertDialogHeader>
+
+                    <AlertDialogBody>
+                        Are you sure? You can&apos;t undo this action afterwards.
+                    </AlertDialogBody>
+
+                    <AlertDialogFooter>
+                        <Button ref={cancelRef} onClick={onClose} disabled={isDeleting}>
+                            Cancel
+                        </Button>
+                        <Button
+                            id={"delete-product-btn"}
+                            ml={3}
+                            colorScheme='red'
+                            disabled={isDeleting}
+                            onClick={async () => {
+                                await deleteProduct(id).unwrap();
+                                onClose();
+                                navigate(AppRoutes.Account);
+                            }}
+                        >
+                            Delete
+                        </Button>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+            </AlertDialogOverlay>
+        </AlertDialog>
     </>;
 };
 
@@ -285,4 +368,3 @@ const Schema = Yup.object().shape({
         .integer()
         .required("You must state the stock of products in possession."),
 });
-

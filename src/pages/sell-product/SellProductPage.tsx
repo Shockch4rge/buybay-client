@@ -17,7 +17,7 @@ import {
     Spinner,
     Text,
     Textarea,
-    useMultiStyleConfig,
+    useToast,
     VStack,
 } from "@chakra-ui/react";
 import { Footer } from "../common/Footer";
@@ -31,6 +31,8 @@ import { CategorySelect } from "./components/CategorySelect";
 import { BackButton } from "../common/BackButton";
 import { useNavigate } from "react-router-dom";
 import { AppRoutes } from "../../util/routes";
+import Utils from "../../util/Utils";
+import { EmptyContent } from "../common/EmptyContent";
 
 const fields = {
     name: "name",
@@ -55,15 +57,18 @@ const asyncComponents = {
 const format = (val: string) => `$` + val;
 const parse = (val: string) => val.replace(/^\$/, "");
 
+
 export const SellProductPage: React.FC = () => {
     const navigate = useNavigate();
+    const toast = useToast();
     const { user } = useAuth();
+    const productImageInputRef = useRef<HTMLInputElement | null>(null);
     const [images, setImages] = useState<File[]>([]);
     const [categories, setCategories] = useState<string[]>([]);
     const [addProduct, { isLoading: isAddingProduct }] = useAddProductMutation();
-    const fileButtonStyles = useMultiStyleConfig("Button", { variant: "secondary", size: "sm" });
 
-    const productImageInputRef = useRef<HTMLInputElement | null>(null);
+
+    if (!user) return <></>;
 
     return <>
         <NavBar />
@@ -88,7 +93,7 @@ export const SellProductPage: React.FC = () => {
                     formData.set(fields.description, values.description);
                     formData.set(fields.price, values.price.toString());
                     formData.set(fields.quantity, values.quantity.toString());
-                    formData.set("seller_id", user!.id);
+                    formData.set("seller_id", user.id);
 
                     for (const image of images) {
                         formData.append(`${fields.images}[]`, image);
@@ -111,7 +116,7 @@ export const SellProductPage: React.FC = () => {
                     isValid,
                 }) =>
                     <>
-                        <Form>
+                        <Form name={"createProduct"}>
                             <VStack w={"full"} mt="4" spacing="6">
                                 <Field name={fields.name}>
                                     {(props: any) =>
@@ -202,18 +207,32 @@ export const SellProductPage: React.FC = () => {
                                                     *Images must be in .jpg or .png format. The first image uploaded will be the product&apos;s thumbnail.
                                                 </Text>
                                             </FormLabel>
-                                            <SimpleGrid mb={"6"} columns={4} spacing={"10"} id={"image-input"}>
-                                                {images.map(image =>
-                                                    <Image
-                                                        key={image.name}
-                                                        src={URL.createObjectURL(image)}
-                                                        alt={image.name}
-                                                        objectFit={"cover"}
-                                                        borderRadius={"md"}
-                                                        boxSize={"56"}
-                                                    />,
-                                                )}
-                                            </SimpleGrid>
+                                            {images.length > 0 ?
+                                                <SimpleGrid
+                                                    mb={"6"}
+                                                    p={"5"}
+                                                    borderColor={"gray.200"}
+                                                    borderWidth={"thin"}
+                                                    borderRadius={"6"}
+                                                    columns={4}
+                                                    spacing={"10"}
+                                                    id={"image-input"}
+                                                >
+                                                    {images.map(image =>
+                                                        <Image
+                                                            key={image.name}
+                                                            src={URL.createObjectURL(image)}
+                                                            alt={image.name}
+                                                            objectFit={"cover"}
+                                                            borderRadius={"md"}
+                                                            boxSize={"56"}
+                                                        />,
+                                                    )}
+                                                </SimpleGrid>
+                                                : <EmptyContent my={"6"}>
+                                                    No images
+                                                </EmptyContent>
+                                            }
                                             {images.length > 0 && <Heading mb={"6"} size={"md"}>
                                                 {images.length} {images.length === 1 ? "image" : "images"}
                                             </Heading>}
@@ -222,9 +241,24 @@ export const SellProductPage: React.FC = () => {
                                                 id={fields.images}
                                                 ref={productImageInputRef}
                                                 type={"file"}
+                                                accept={"image/**"}
                                                 multiple
                                                 hidden
-                                                onChange={e => setImages(Array.from(e.target.files ?? []))}
+                                                onChange={async e => {
+                                                    try {
+                                                        const images = await Promise.all(
+                                                            Array.from(e.target.files ?? [])
+                                                                .map(f => Utils.compress(f)),
+                                                        );
+                                                        setImages(images);
+                                                    }
+                                                    catch (e) {
+                                                        toast({
+                                                            title: "Invalid file type. Please upload a .jpeg or .png image.",
+                                                            status: "error",
+                                                        });
+                                                    }
+                                                }}
                                             />
                                             <Button onClick={() => productImageInputRef.current?.click()}>
                                                 Attach images
