@@ -70,12 +70,13 @@ export const CategorySelect: React.FC<Props> = ({ onCreate, product }) => {
             </Heading>
         </FormLabel>
         <AsyncCreatableSelect
-            id={"categories"}
+            id={"edit-categories"}
             isMulti
             components={asyncComponents}
             placeholder={"Select or create a category"}
             loadOptions={debouncedSearch}
             colorScheme={"green"}
+            classNamePrefix={"react-select"}
             formatOptionLabel={formatOptionLabel}
             // eslint-disable-next-line @typescript-eslint/ban-ts-comment
             // @ts-ignore weird types

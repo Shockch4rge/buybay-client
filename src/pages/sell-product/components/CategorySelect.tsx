@@ -70,6 +70,7 @@ export const CategorySelect: React.FC<Props> = ({ onCreate }) => {
             </Heading>
         </FormLabel>
         <AsyncCreatableSelect
+            classNamePrefix={"react-select"}
             id={"categories"}
             isMulti
             components={asyncComponents}
