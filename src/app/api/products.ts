@@ -184,6 +184,7 @@ export const {
     useUpdateProductMutation,
     useAddProductCategoriesMutation,
     useLazyGetCategoryProductsQuery,
+    useDeleteProductMutation,
 } = productsApi;
 
 export default productsApi;
