@@ -24,7 +24,6 @@ import {
     SliderThumb,
     SliderTrack,
     Spinner,
-    Text,
     Textarea,
     VStack,
 } from "@chakra-ui/react";
@@ -32,12 +31,12 @@ import { useAppDispatch, useAppSelector } from "../../../app/store/hooks";
 import { closeModal } from "../../../app/store/slices/ui/modals";
 import { useAddProductReviewMutation } from "../../../app/api/productReviews";
 import { FaStar } from "react-icons/fa";
-import { useState } from "react";
 import { Product } from "../../../util/models/Product";
 import { useAuth } from "../../../app/context/AuthContext";
 
 const titleField = "title";
 const descriptionField = "description";
+const ratingField = "rating";
 
 const labelStyles = {
     mt: "4",
@@ -53,7 +52,6 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
     const navigate = useNavigate();
     const dispatch = useAppDispatch();
     const { user } = useAuth();
-    const [rating, setRating] = useState(1);
     const [addReview] = useAddProductReviewMutation();
     const { open } = useAppSelector(state => state.ui.modals.createReview);
 
@@ -70,8 +68,9 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
                     initialValues={{
                         [titleField]: "",
                         [descriptionField]: "",
+                        [ratingField]: 1,
                     }}
-                    onSubmit={async ({ title, description }) => {
+                    onSubmit={async ({ title, description, rating }) => {
                         await addReview({
                             author_id: user!.id,
                             product_id: product.id,
@@ -82,12 +81,12 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
                         close();
                     }}
                 >
-                    {({ errors, touched, isSubmitting, isValid, getFieldProps }) =>
+                    {({ errors, touched, isSubmitting, isValid, getFieldProps, setFieldValue }) =>
                         <ModalBody>
                             <Heading size="lg">
                                 Write a review
                             </Heading>
-                            <Form>
+                            <Form name={"createReview"}>
                                 <VStack mt="10" spacing="6" align={"start"}>
                                     <Field name={titleField}>
                                         {(props: any) =>
@@ -129,33 +128,44 @@ export const CreateReviewModal: React.FC<Props> = ({ product }) => {
                                         }
                                     </Field>
 
-                                    <Text>Rating</Text>
-                                    <Box w={"full"} px={"2"}>
-                                        <Slider defaultValue={1} min={1} max={5} step={1} onChange={val => setRating(val)}>
-                                            <SliderMark value={1} {...labelStyles}>
-                                                1
-                                            </SliderMark>
-                                            <SliderMark value={2} {...labelStyles}>
-                                                2
-                                            </SliderMark>
-                                            <SliderMark value={3} {...labelStyles}>
-                                                3
-                                            </SliderMark>
-                                            <SliderMark value={4} {...labelStyles}>
-                                                4
-                                            </SliderMark>
-                                            <SliderMark value={5} {...labelStyles}>
-                                                5
-                                            </SliderMark>
-                                            <SliderTrack>
-                                                <SliderFilledTrack bg={"green.300"} />
-                                            </SliderTrack>
-                                            <SliderThumb boxSize={6} textColor={"green.300"}>
-                                                <FaStar />
-                                            </SliderThumb>
-                                        </Slider>
-                                    </Box>
-
+                                    <Field name={ratingField}>
+                                        {(props: any) =>
+                                            <Box w={"full"} px={"2"}>
+                                                <FormLabel htmlFor={ratingField}>
+                                                    Rating
+                                                </FormLabel>
+                                                <Slider
+                                                    defaultValue={1}
+                                                    min={1}
+                                                    max={5}
+                                                    step={1}
+                                                    onChange={val => setFieldValue(ratingField, val)}
+                                                >
+                                                    <SliderMark value={1} {...labelStyles}>
+                                                        1
+                                                    </SliderMark>
+                                                    <SliderMark value={2} {...labelStyles}>
+                                                        2
+                                                    </SliderMark>
+                                                    <SliderMark value={3} {...labelStyles}>
+                                                        3
+                                                    </SliderMark>
+                                                    <SliderMark value={4} {...labelStyles}>
+                                                        4
+                                                    </SliderMark>
+                                                    <SliderMark value={5} {...labelStyles}>
+                                                        5
+                                                    </SliderMark>
+                                                    <SliderTrack>
+                                                        <SliderFilledTrack bg={"green.300"} />
+                                                    </SliderTrack>
+                                                    <SliderThumb className={"review-rating-slider-thumb"} boxSize={6} textColor={"green.300"}>
+                                                        <FaStar size={"14"}/>
+                                                    </SliderThumb>
+                                                </Slider>
+                                            </Box>
+                                        }
+                                    </Field>
                                 </VStack>
 
                                 <ModalFooter>
