@@ -1,0 +1,11 @@
+services:
+  frontend:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: buybay/client
+    container_name: buybay-client
+    ports:
+      - 8001:80
+    volumes:
+      - .:/usr/src/app

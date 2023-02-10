@@ -1,0 +1,45 @@
+name: Run E2E suites and deploy to EC2
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "**"
+
+jobs:
+  install:
+    runs-on: ubuntu-latest
+    steps:
+#      - name: Checkout
+#        uses: actions/checkout@v2
+#
+#      - name: Cypress run
+#        uses: cypress-io/github-action@v5
+#        with:
+#          browser: chrome
+#          build: npm run build
+#          start: npm run dev
+#          wait-on: "http://localhost:5173"
+#          env:
+#            VITE_URL: "http://localhost:5173"
+#            USERS_API: ${{ secrets.VITE_USERS_API }}
+#            ORDERS_API: ${{ secrets.VITE_ORDERS_API }}
+#            PRODUCTS_API: ${{ secrets.VITE_PRODUCTS_API }}
+#            PRODUCT_REVIEWS_API: ${{ secrets.VITE_PRODUCT_REVIEWS_API }}
+
+      - name: SSH into EC2
+        uses: appleboy/ssh-action@master
+        with:
+          host: ${{ secrets.HOST_ADDRESS }}
+          username: ${{ secrets.HOST_USERNAME }}
+          key: ${{ secrets.AWS_SSH_KEY }}
+          script: |
+            cd ~/buybay/buybay-client
+            git pull origin main
+            echo "VITE_USERS_API=${{ secrets.VITE_USERS_API }}" > .env
+            echo "VITE_ORDERS_API=${{ secrets.VITE_ORDERS_API }}" >> .env
+            echo "VITE_PRODUCTS_API=${{ secrets.VITE_PRODUCTS_API }}" >> .env
+            echo "VITE_PRODUCT_REVIEWS_API=${{ secrets.VITE_PRODUCT_REVIEWS_API }}" >> .env
+            echo "VITE_STRIPE_PUBLISHABLE_KEY=${{ secrets.VITE_STRIPE_PUBLISHABLE_KEY }}" >> .env
+            echo "VITE_STRIPE_SECRET_KEY=${{ secrets.VITE_STRIPE_SECRET_KEY }}" >> .env
+            docker-compose up -d --build
