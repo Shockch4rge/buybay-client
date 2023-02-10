@@ -6,6 +6,6 @@ services:
     image: buybay/client
     container_name: buybay-client
     ports:
-      - 8001:80
+      - 80:80
     volumes:
       - .:/usr/src/app
