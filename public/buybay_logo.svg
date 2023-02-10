@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="171" height="148" viewBox="0 0 171 148">
+  <defs>
+    <radialGradient id="radial-gradient" cx="-0.102" cy="1.076" r="2.287" gradientTransform="matrix(0.415, -0.91, 0.753, 0.344, -0.871, 0.613)" gradientUnits="objectBoundingBox">
+      <stop offset="0" stop-color="#43fdf1"/>
+      <stop offset="1" stop-color="#0f6"/>
+    </radialGradient>
+  </defs>
+  <path id="buybay_logo" d="M121.324,0a12,12,0,0,1,10.391,6l35.818,62a12,12,0,0,1,0,12.006l-35.818,62a12,12,0,0,1-10.391,6H49.676a12,12,0,0,1-10.391-6L3.468,80A12,12,0,0,1,3.468,68L39.285,6A12,12,0,0,1,49.676,0Z" fill="url(#radial-gradient)"/>
+</svg>
