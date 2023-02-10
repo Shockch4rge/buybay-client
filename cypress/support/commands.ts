@@ -36,8 +36,10 @@
 //   }
 // }
 
+import { AppRoutes } from "../../src/util/routes";
+
 Cypress.Commands.add("login", (email = "john@gmail.com", password = "password123") => {
-    cy.visit("/");
+    cy.visit(AppRoutes.Landing);
 
     cy.intercept({
         method: "POST",

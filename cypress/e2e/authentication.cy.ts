@@ -1,3 +1,5 @@
+import { AppRoutes } from "../../src/util/routes";
+
 describe("authentication", () => {
     before(() => {
         cy.request({
@@ -7,7 +9,7 @@ describe("authentication", () => {
     });
 
     it("user attempts to login with invalid credentials", () => {
-        cy.visit("/");
+        cy.visit(AppRoutes.Landing);
 
         cy.intercept({
             method: "POST",
@@ -85,7 +87,7 @@ describe("authentication", () => {
     });
 
     it("user can register for an account", () => {
-        cy.visit("/");
+        cy.visit(AppRoutes.Landing);
 
         cy.intercept({
             method: "POST",
