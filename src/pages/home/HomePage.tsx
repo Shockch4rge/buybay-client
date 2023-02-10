@@ -65,7 +65,13 @@ export const HomePage: React.FC = () => {
                     <VStack mt={"6"} align={"start"} spacing={"4"}>
                         <CheckboxGroup onChange={debounced}>
                             {categories.map(category =>
-                                <Checkbox {...getCheckboxProps()} key={category.id} colorScheme={"cyan"} size={"lg"} value={category.id}>
+                                <Checkbox
+                                    {...getCheckboxProps()}
+                                    key={category.id}
+                                    colorScheme={"cyan"}
+                                    size={"lg"}
+                                    value={category.id}
+                                >
                                     {category.name}
                                 </Checkbox>,
                             )}
@@ -84,8 +90,7 @@ export const HomePage: React.FC = () => {
                                 <CardBody>
                                     <AspectRatio ratio={16/10}>
                                         <Image
-                                        // src={product.images.find(i => i.isThumbnail)!.url}
-                                            src={product.images[0]?.url ?? "https://i.scdn.co/image/ab6761610000e5eb45c0f559e90489af64359a59"}
+                                            src={product.images.find(i => i.isThumbnail)?.url ?? "https://i.scdn.co/image/ab6761610000e5eb45c0f559e90489af64359a59"}
                                             alt='Green double couch with wooden legs'
                                             borderRadius='lg'
                                         />

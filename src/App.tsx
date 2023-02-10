@@ -17,6 +17,7 @@ import { loadStripe } from "@stripe/stripe-js";
 import { CheckoutSuccessPage } from "./pages/checkout/CheckoutSuccessPage";
 import { CheckoutCancelledPage } from "./pages/checkout/CheckoutCancelledPage";
 import { OrderPage } from "./pages/order/OrderPage";
+import { LandingPage } from "./pages/landing/LandingPage";
 
 const stripe = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
 
@@ -32,7 +33,8 @@ const App: React.FC = () => {
 
     return <>
         <Routes>
-            <Route index element={<HomePage/>}/>
+            <Route index element={<LandingPage/>} />
+            <Route path={AppRoutes.Home} element={<HomePage />} />
             <Route path={AppRoutes.Cart} element={<CartPage />} />
             <Route path={AppRoutes.Product(":id")} element={<ProductPage />} />
             <Route path={AppRoutes.SellProduct} element={<SellProductPage />} />

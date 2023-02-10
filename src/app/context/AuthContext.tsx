@@ -50,9 +50,11 @@ export const AuthProvider: React.FC<PropsWithChildren> = ({ children }) => {
 
     useEffect(() => {
         if (!token || !user) {
-            navigate(AppRoutes.Home, { replace: true });
+            navigate(AppRoutes.Landing, { replace: true });
+            return;
         }
 
+        navigate(AppRoutes.Home, { replace: true });
     }, [token, user]);
 
     const loginUser = useCallback(

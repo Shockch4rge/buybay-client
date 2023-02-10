@@ -1,5 +1,6 @@
 export const AppRoutes = {
-    Home: "/",
+    Landing: "/",
+    Home: "/home",
     Cart: "/cart",
     Product: (id = ":id") => `/product/${id}`,
     SellProduct: "/sell-product",
